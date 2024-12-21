@@ -30,6 +30,12 @@ type P2CServeParameters struct {
 
 	// Frame size
 	FrameSize int
+
+	// Protocol
+	Protocol string
+
+	// Package directory
+	PackageDir string
 }
 
 // Connect client to a peer

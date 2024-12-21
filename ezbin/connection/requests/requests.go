@@ -4,27 +4,26 @@ import (
 	"strings"
 )
 
-// Arbitrary request to do by the server
-type Request interface {
-	// Get the request header
-	Header() string
-}
-
-type Response interface {
-}
-
-// A command to send to the peer
-type PeerCommand struct {
-	Header  string  `json:"header"`
-	Request Request `json:"request"`
-}
-
 // Convert a header to a request
-func HeaderToRequestResponse(header string) (Request, Response) {
+func HeaderToRequest(header string) any {
 	switch strings.TrimRight(header, "\x00") {
-	case HandshakeRequest{}.Header():
-		return &HandshakeRequest{}, &HandshakeResponse{}
+	case HeaderHandshake:
+		return &HandshakeRequest{}
+	case HeaderPackageInfo:
+		return &PackageInfoRequest{}
 	}
 
-	return nil, nil
+	return nil
+}
+
+// Convert a header to a response
+func HeaderToResponse(header string) any {
+	switch strings.TrimRight(header, "\x00") {
+	case HeaderHandshake:
+		return &HandshakeRequest{}
+	case HeaderPackageInfo:
+		return &PackageInfoResponse{}
+	}
+
+	return nil
 }

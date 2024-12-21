@@ -3,8 +3,10 @@ package connection
 import (
 	"encoding/json"
 	"net"
+	"strings"
 
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
+	"github.com/nfwGytautas/ezbin/ezbin/errors"
 	"github.com/nfwGytautas/ezbin/shared"
 )
 
@@ -27,9 +29,10 @@ func (c *connectionC2P) open() error {
 	c.buffer = make([]byte, HANDSHAKE_BUFFER_SIZE)
 
 	// Handshake with the peer
-	err = c.Send(requests.HandshakeRequest{
-		UserIdentifier: c.params.UserIdentifier,
-	})
+	err = c.handshake()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -40,14 +43,12 @@ func (c *connectionC2P) Close() {
 }
 
 // Send data to the peer
-func (c *connectionC2P) Send(req requests.Request) error {
-	header := []byte(req.Header())
-
+func (c *connectionC2P) send(header string, req any) error {
 	if len(header) > HEADER_SIZE_BYTES {
-		return ErrHeaderTooLarge
+		return errors.ErrHeaderTooLarge
 	}
 
-	err := shared.WriteSubRange(c.buffer, 0, header)
+	err := shared.WriteSubRange(c.buffer, 0, []byte(header))
 	if err != nil {
 		return err
 	}
@@ -68,4 +69,74 @@ func (c *connectionC2P) Send(req requests.Request) error {
 	}
 
 	return nil
+}
+
+// Receive data from peer
+func (c *connectionC2P) receive(res any) error {
+	n, err := c.conn.Read(c.buffer)
+	if err != nil {
+		return err
+	}
+
+	header := c.buffer[:HEADER_SIZE_BYTES]
+	headerString := string(header)
+
+	if strings.TrimRight(headerString, "\x00") == requests.ERROR_HEADER {
+		return errors.ErrIncorrectHeader
+	}
+
+	err = json.Unmarshal(c.buffer[HEADER_SIZE_BYTES:n], res)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Handshake with the peer
+func (c *connectionC2P) handshake() error {
+	req := requests.HandshakeRequest{
+		UserIdentifier: c.params.UserIdentifier,
+	}
+
+	res := requests.HandshakeResponse{}
+
+	err := c.send(requests.HeaderHandshake, req)
+	if err != nil {
+		return err
+	}
+
+	err = c.receive(&res)
+	if err != nil {
+		return err
+	}
+
+	if res.Okay == false {
+		return errors.ErrHandshakeFailed
+	}
+
+	c.buffer = make([]byte, res.Framesize)
+
+	return nil
+}
+
+// Get package info from peer
+func (c *connectionC2P) GetPackageInfo(name string) (*requests.PackageInfoResponse, error) {
+	req := requests.PackageInfoRequest{
+		Package: name,
+	}
+
+	res := requests.PackageInfoResponse{}
+
+	err := c.send(requests.HeaderPackageInfo, req)
+	if err != nil {
+		return nil, err
+	}
+
+	err = c.receive(&res)
+	if err != nil {
+		return nil, err
+	}
+
+	return &res, nil
 }

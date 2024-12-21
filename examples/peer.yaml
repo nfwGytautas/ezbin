@@ -36,6 +36,7 @@ connection:
 server:
     port: 32000
     framesize: 4096
+storage:
+    location: ./examples/packages
 peer:
-    supportedProtocols:
-        - noop
+    protocol: "noop"

@@ -27,16 +27,6 @@ func FileExists(path string) (bool, error) {
 	return true, nil
 }
 
-// Get the home directory
-func HomeDirectory() (string, error) {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return "", err
-	}
-
-	return home, nil
-}
-
 // Read a json file and parse it
 func ReadJson(path string, data interface{}) error {
 	file, err := os.Open(path)

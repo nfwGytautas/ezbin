@@ -18,6 +18,7 @@ type DaemonConfig struct {
 	Identifier string         `yaml:"identifier"`
 	Connection ConnectionKeys `yaml:"connection"`
 	Server     ServerConfig   `yaml:"server"`
+	Storage    StorageConfig  `yaml:"storage"`
 	Peer       *PeerConfig    `yaml:"peer"`
 }
 
@@ -33,9 +34,14 @@ type ServerConfig struct {
 	FrameSize int `yaml:"framesize"`
 }
 
+// Storage settings
+type StorageConfig struct {
+	Location string `yaml:"location"`
+}
+
 // Peer mode
 type PeerConfig struct {
-	SupportedProtocols []string `yaml:"supportedProtocols"`
+	Protocol string `yaml:"protocol"`
 }
 
 // Create a new base config
@@ -78,6 +84,8 @@ func newBaseConfig() (*DaemonConfig, error) {
 	// Other properties
 	dc.Server.Port = 32000
 	dc.Server.FrameSize = 1024
+
+	dc.Storage.Location = "packages/"
 
 	return &dc, nil
 }

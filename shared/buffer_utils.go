@@ -2,6 +2,7 @@ package shared
 
 import "errors"
 
+// Write a binary sub range
 func WriteSubRange(buffer []byte, start int, data []byte) error {
 	if len(data) > len(buffer)-start {
 		return errors.New("data exceeds buffer size")
@@ -11,9 +12,7 @@ func WriteSubRange(buffer []byte, start int, data []byte) error {
 		return nil
 	}
 
-	for i := 0; i < len(data); i++ {
-		buffer[start+i] = data[i]
-	}
+	copy(buffer[start:], data)
 
 	return nil
 }

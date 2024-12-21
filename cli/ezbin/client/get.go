@@ -2,6 +2,7 @@ package ez_client
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/nfwGytautas/ezbin/ezbin/connection"
 )
@@ -24,6 +25,14 @@ func GetPackage(i *UserIdentity, pck string, peer string) error {
 		return err
 	}
 	defer conn.Close()
+
+	// Get package info
+	pckInfo, err := conn.GetPackageInfo(pck)
+	if err != nil {
+		return err
+	}
+
+	log.Println(pckInfo)
 
 	return nil
 }
