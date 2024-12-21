@@ -1,0 +1,35 @@
+version: 0.1.0
+identifier: 0193ea41-cc52-75e7-8a66-6dd95e296f46
+connectionKey: !!binary |
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqx6aL1q24zMj0McIxeBQmXnafb
+    CQhlpHjOAqg0Q4Bt3pjGQAtqbQ4hG/LsmepkhMmp9xuR8P5X5kzSJEN2tJmWb1IQR7CAPF
+    VdYwCJXiuTAK2Rn833m//iK2Xk6+BunzLrGfly2I+Bq0m0PBLTdcr6BHTNq36XubQV4hMV
+    QFLX3c1D3sJsKnXG1+aAqy0IcUwafLGhVZaqRzTVQckhbeGPisw6khsnkPBMXryl8ggPy1
+    zCHpbWmPoXOKJD2X4aKP+IJ8QwGrdYfH6ZjWnuAGVLerMCUtL1wnR8/48bM4+gOFWJHJoa
+    9d9cK245ajpTPzeiJNKUNkKmL/3uSwiPyONwIDAQAB
+connectionPrivateKey: !!binary |
+    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCrHpovWrbjMyPQxwjF4F
+    CZedp9sJCGWkeM4CqDRDgG3emMZAC2ptDiEb8uyZ6mSEyan3G5Hw/lfmTNIkQ3a0mZZvUh
+    BHsIA8VV1jAIleK5MArZGfzfeb/+IrZeTr4G6fMusZ+XLYj4GrSbQ8EtN1yvoEdM2rfpe5
+    tBXiExVAUtfdzUPewmwqdcbX5oCrLQhxTBp8saFVlqpHNNVBySFt4Y+KzDqSGyeQ8ExevK
+    XyCA/LXMIeltaY+hc4okPZfhoo/4gnxDAat1h8fpmNae4AZUt6swJS0vXCdHz/jxszj6A4
+    VYkcmhr131wrbjlqOlM/N6Ik0pQ2QqYv/e5LCI/I43AgMBAAECggEBAIRr3i2fKcCQprq+
+    C8/1UuoyHh7+MBmIa65dGwkSFblaqY13JgYy+Zq42RY/+IH9mSpfEQaNPyP9t8v3JIsuf3
+    oy7qdqbDs7j85pPiqmsxlUUFDJh6L4+NaVzkMU9IEtMn+D/VhkaIZ3RCSTPj7bhOJ0Sjjz
+    WTdZ7D+dtFoUBx237/pVCz8gbCdABMvaJfB66ykAO97Sg/HrzRZVLLMPXL91OhR4iw4/Uw
+    zeK8dKIfB9ih4kUSG15ENirr7HLnAX6zX+7rwlM3ucpGHS+4+OQ3pTwvRnqMWpudlzEro2
+    UGBhWktXfr2IjSok2asDPp540PVZeZGKhBXdcPqPVKveDuECgYEAwg19SE31q9XpFdvoB/
+    71utC6LPXOhMXyBHZ1O8H8bP/b9zZj8f05Z0ryX2L9Ttd6vYXSl++qx394ajI8/8L8yecD
+    UQvI93mRNU2/aTyOUWCkpm3/2M2JEGymtyKYJdSjuTD7uQ8of2aslQKO3gvrzRxRar9/NN
+    RFT1idOCzedNUCgYEA4b70I5LM90l6t28Ls4Hza5Fy2lXfpC7dSHIbVaLVxgwJ51qooPb1
+    OZ/GI3HAJP8uH8ovLZoOycgtY6h6R0d2Ksp5gv10q/wLFi4ipw56PBusI8AiPAZ37hMgJm
+    x31rioaRhAlhbhrJ0CCxq7Myp6Kl+e8AwFDMmzc3ejpTUyLNsCgYASQqCyaBuhEtz/IJVi
+    AzzuWmvahTrsxY+zmc4IVIXDYAQ77BNVlyWKscPC9BawD5jOMsSRZY0lfro/DAEvdBLDkQ
+    h/3OMJXpgqcul7Jqahw71ap+k2ZojqUb8SZp/4l1zctV5KmMGP04KT9wyommiTAYIr0F9R
+    AlSPVeBdg+NfDQKBgQC0i+N4nA0/7c2u7ao/HDzSGFbyVmHyTuT97vz7pasxpSk6lqBtdH
+    Y2axmt+WkCbfC2zh6jayZOrcHXhcSeQ4I3wQ4j/JAWiRNY3vcqAwMyFbO8OAtpVIcQqs04
+    zeGeortWqmXlZFGDm2Mp/GwiBOQGBcn5FLPpQVw7ikEgfYYupwKBgBbSU6pXXUbLrXy1e3
+    jr/llEHsrOMIwnR6tBCa1QcL/DfU02cqALjzlTtl4BhDgBzmEjf8Vf/qBbs4yhIHKAEzRz
+    d5S/96ulwmCbBaylqFhS+fXk9LoH/dC/wu2Su/yR6inaRmydF6L/+2x0iD8iZOb0iC5A2D
+    EEAbThj3jtdPDC
+peer: null

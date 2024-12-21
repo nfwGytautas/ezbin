@@ -5,6 +5,8 @@ import (
 	"errors"
 	"io/ioutil"
 	"os"
+
+	"gopkg.in/yaml.v3"
 )
 
 // Check if a file exists
@@ -70,6 +72,48 @@ func WriteJson(path string, data interface{}) error {
 	defer file.Close()
 
 	_, err = file.Write(jsonData)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Read a yaml file and parse it
+func ReadYAML(path string, data interface{}) error {
+	file, err := os.Open(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	dataBin, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	err = yaml.Unmarshal(dataBin, &data)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Marshal data to yaml and write it to a file
+func WriteYAML(path string, data interface{}) error {
+	yamlData, err := yaml.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Create(path)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	_, err = file.Write(yamlData)
 	if err != nil {
 		return err
 	}
