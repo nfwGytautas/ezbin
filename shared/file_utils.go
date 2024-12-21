@@ -92,7 +92,7 @@ func ReadYAML(path string, data interface{}) error {
 		return err
 	}
 
-	err = yaml.Unmarshal(dataBin, &data)
+	err = yaml.Unmarshal(dataBin, data)
 	if err != nil {
 		return err
 	}

@@ -1,35 +1,41 @@
 version: 0.1.0
-identifier: 0193ea41-cc52-75e7-8a66-6dd95e296f46
-connectionKey: !!binary |
-    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAqx6aL1q24zMj0McIxeBQmXnafb
-    CQhlpHjOAqg0Q4Bt3pjGQAtqbQ4hG/LsmepkhMmp9xuR8P5X5kzSJEN2tJmWb1IQR7CAPF
-    VdYwCJXiuTAK2Rn833m//iK2Xk6+BunzLrGfly2I+Bq0m0PBLTdcr6BHTNq36XubQV4hMV
-    QFLX3c1D3sJsKnXG1+aAqy0IcUwafLGhVZaqRzTVQckhbeGPisw6khsnkPBMXryl8ggPy1
-    zCHpbWmPoXOKJD2X4aKP+IJ8QwGrdYfH6ZjWnuAGVLerMCUtL1wnR8/48bM4+gOFWJHJoa
-    9d9cK245ajpTPzeiJNKUNkKmL/3uSwiPyONwIDAQAB
-connectionPrivateKey: !!binary |
-    MIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCrHpovWrbjMyPQxwjF4F
-    CZedp9sJCGWkeM4CqDRDgG3emMZAC2ptDiEb8uyZ6mSEyan3G5Hw/lfmTNIkQ3a0mZZvUh
-    BHsIA8VV1jAIleK5MArZGfzfeb/+IrZeTr4G6fMusZ+XLYj4GrSbQ8EtN1yvoEdM2rfpe5
-    tBXiExVAUtfdzUPewmwqdcbX5oCrLQhxTBp8saFVlqpHNNVBySFt4Y+KzDqSGyeQ8ExevK
-    XyCA/LXMIeltaY+hc4okPZfhoo/4gnxDAat1h8fpmNae4AZUt6swJS0vXCdHz/jxszj6A4
-    VYkcmhr131wrbjlqOlM/N6Ik0pQ2QqYv/e5LCI/I43AgMBAAECggEBAIRr3i2fKcCQprq+
-    C8/1UuoyHh7+MBmIa65dGwkSFblaqY13JgYy+Zq42RY/+IH9mSpfEQaNPyP9t8v3JIsuf3
-    oy7qdqbDs7j85pPiqmsxlUUFDJh6L4+NaVzkMU9IEtMn+D/VhkaIZ3RCSTPj7bhOJ0Sjjz
-    WTdZ7D+dtFoUBx237/pVCz8gbCdABMvaJfB66ykAO97Sg/HrzRZVLLMPXL91OhR4iw4/Uw
-    zeK8dKIfB9ih4kUSG15ENirr7HLnAX6zX+7rwlM3ucpGHS+4+OQ3pTwvRnqMWpudlzEro2
-    UGBhWktXfr2IjSok2asDPp540PVZeZGKhBXdcPqPVKveDuECgYEAwg19SE31q9XpFdvoB/
-    71utC6LPXOhMXyBHZ1O8H8bP/b9zZj8f05Z0ryX2L9Ttd6vYXSl++qx394ajI8/8L8yecD
-    UQvI93mRNU2/aTyOUWCkpm3/2M2JEGymtyKYJdSjuTD7uQ8of2aslQKO3gvrzRxRar9/NN
-    RFT1idOCzedNUCgYEA4b70I5LM90l6t28Ls4Hza5Fy2lXfpC7dSHIbVaLVxgwJ51qooPb1
-    OZ/GI3HAJP8uH8ovLZoOycgtY6h6R0d2Ksp5gv10q/wLFi4ipw56PBusI8AiPAZ37hMgJm
-    x31rioaRhAlhbhrJ0CCxq7Myp6Kl+e8AwFDMmzc3ejpTUyLNsCgYASQqCyaBuhEtz/IJVi
-    AzzuWmvahTrsxY+zmc4IVIXDYAQ77BNVlyWKscPC9BawD5jOMsSRZY0lfro/DAEvdBLDkQ
-    h/3OMJXpgqcul7Jqahw71ap+k2ZojqUb8SZp/4l1zctV5KmMGP04KT9wyommiTAYIr0F9R
-    AlSPVeBdg+NfDQKBgQC0i+N4nA0/7c2u7ao/HDzSGFbyVmHyTuT97vz7pasxpSk6lqBtdH
-    Y2axmt+WkCbfC2zh6jayZOrcHXhcSeQ4I3wQ4j/JAWiRNY3vcqAwMyFbO8OAtpVIcQqs04
-    zeGeortWqmXlZFGDm2Mp/GwiBOQGBcn5FLPpQVw7ikEgfYYupwKBgBbSU6pXXUbLrXy1e3
-    jr/llEHsrOMIwnR6tBCa1QcL/DfU02cqALjzlTtl4BhDgBzmEjf8Vf/qBbs4yhIHKAEzRz
-    d5S/96ulwmCbBaylqFhS+fXk9LoH/dC/wu2Su/yR6inaRmydF6L/+2x0iD8iZOb0iC5A2D
-    EEAbThj3jtdPDC
-peer: null
+identifier: 0193ead4-653d-770c-a08f-670c72d501cb
+connection:
+    public: |
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA59hDoFQIW6KS9AUXdkRiEklzL2
+        IkENNi1Ao3oZ4pvCzH5+amuY5oqG1s4OaYwZ5Qlc89bZ2j/nrllTxMhjImlgv5s+u4l38i
+        5UhcF1wWChvtjEKwWfn7T1M/IHVATeAQ28MTU08TFupwfWVmMPH9JpGqPnt6DejEOtfJfi
+        XT7ki9vRKcGn+qOJ4hJarnJShKINvEI6VKT5zdTTbWLHNngjkJBrSM/qjMhYFAJKpAfc1J
+        aB8VFNC/d/v1LNJhjTDx7VPNAu+cf2T3Bk4qt3uwHCQHAa2TaCgh19uIfZRU9Se3NMEe5G
+        JoPjXspUvuER6RcKMAuNzjMNp3MVydyFYHlQIDAQAB
+    private: |
+        MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDn2EOgVAhbopL0BRd2RG
+        ISSXMvYiQQ02LUCjehnim8LMfn5qa5jmiobWzg5pjBnlCVzz1tnaP+euWVPEyGMiaWC/mz
+        67iXfyLlSFwXXBYKG+2MQrBZ+ftPUz8gdUBN4BDbwxNTTxMW6nB9ZWYw8f0mkao+e3oN6M
+        Q618l+JdPuSL29Epwaf6o4niElquclKEog28QjpUpPnN1NNtYsc2eCOQkGtIz+qMyFgUAk
+        qkB9zUloHxUU0L93+/Us0mGNMPHtU80C75x/ZPcGTiq3e7AcJAcBrZNoKCHX24h9lFT1J7
+        c0wR7kYmg+NeylS+4RHpFwowC43OMw2ncxXJ3IVgeVAgMBAAECggEAeAukyIl6YmhFixBv
+        248A8NMTTz+TyRqLG5vGvmp01biiMdNeFMpGKp+uNq1v/yEIPOm3tuBfH89mvOUiAoJJNH
+        wy6RRu2hK8cNgMxxOpXcakM3H8ejpUA/jowNe1Wh1g3Ume4g4Zpk3xvRwZ09IY8DWQXxX0
+        VutlX8qHzEet+ry3HpFfici1erxvdsZDDh55QOa41GTfiX+lS60CspPpaojIGRPtpx9RF2
+        LIpqMSnrRS6rcNadrD2ZDAGljIMh6OtQ8Pfshjeccxj4zSj+uq9yYAoGGUxjsyjKzxvpOg
+        G8h9on2kA9oAVjZ9PwHZZw7eh3/S5ZKTuta5fpuJ6Rqi6QKBgQD3pSjpnBZvskPzqaF/GV
+        KATwkdJkYy/6vXDcHxEt3m6v8CftUSQEsqS98RuXuBOHxSmW7gmiH/FHMzFMH7ozCKqL8M
+        ZoR9+mZbirU0h8tpeba0qRxKto28AU0RQM2xLEG7d6Wbi2t9MiWl7ImR/a6XlY/eedlYBl
+        F3FpcE1lnhbwKBgQDvqqQcLWLSXFUfJEVxfQ9S9c7lu5bq57gPj/boB7cO7bmuZvNUdQe8
+        Rul47Zs4oEpbvS+y1df5dvK1m5xSN5/NlVG97S+cGLt4YdqzIQ0m0pS7x19/4zKtHYUMMN
+        xv2x7LY5SANoiIN+dFVmBf11MGaAKYHnkGYU00JgURuIKdOwKBgQDufE43EssEjA8mc0CE
+        TtWFnRdwy/AkotVQx/3ydDHgdIRaWdxFtEbul5xdzFsk6UnIndwKTkTZCk+abK4W8GQJ1F
+        IP1hZX37F9DMpOqUt56u3Jc2Y8iStbV4FpURgFPFKc/68raQt9yLI65NzjDAN8FVs0a/Gj
+        9Im1frq2vNpX3wKBgQCUKXbI4Jn+GAybcu3nSfvmOoXMahrTX6rfHA30xYg6l2Y51fVJ2g
+        uNLn15P9K8wAMYEa3iLecVlp5W/Ts3bKHDEzN0aaQMKRIESuJL6Pvba0V9jLSSOB+E/AHb
+        Vn2APQMdk5MjbBMduwmjSNHNji0KgdRQvE3vTsnOmk559QnyLwKBgQCo81VBRb+c3h668c
+        xEItSU+97crVUJuhRRyVCGzXtcHHGoCnBiB8nij9Bl0/n9sLq17Zqe5lM51BlRU4ZnQNhH
+        Xi6hVY20DPP6Ro6mbFu18dbas96rpHzX3d6qV1dcjgZ4IKM4dzcLYfIjUqUdMSk7i3+8Sd
+        Ya9c0t0Qug5ytVVg==
+server:
+    port: 32000
+    framesize: 4096
+peer:
+    supportedProtocols:
+        - noop

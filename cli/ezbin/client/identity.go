@@ -138,7 +138,7 @@ func (us *UserIdentity) AddPeer(name string, addr string, key string, verify boo
 	// Try and connect to the peer
 	if verify {
 		fmt.Println("Verifying connection to peer...")
-		connection, err := connection.ConnectC2P(connection.ConnectArgs{
+		connection, err := connection.ConnectC2P(connection.C2PConnectionParameters{
 			Peer: connection.PeerConnectionData{
 				Address:       addr,
 				ConnectionKey: key,
@@ -185,7 +185,7 @@ func (us *UserIdentity) CheckPeers() {
 	fmt.Println("Checking connections to peers...")
 
 	for peer, c := range us.Peers {
-		conn, err := connection.ConnectC2P(connection.ConnectArgs{
+		conn, err := connection.ConnectC2P(connection.C2PConnectionParameters{
 			Peer:           c,
 			UserIdentifier: us.Identifier,
 		})

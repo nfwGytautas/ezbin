@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"crypto/rand"
@@ -14,20 +14,36 @@ const CONNECTION_KEY_SIZE = 2048
 
 // Daemon config
 type DaemonConfig struct {
-	Version              string      `yaml:"version"`
-	Identifier           string      `yaml:"identifier"`
-	ConnectionKey        string      `yaml:"connectionKey"`
-	ConnectionPrivateKey string      `yaml:"connectionPrivateKey"`
-	Peer                 *PeerConfig `yaml:"peer"`
+	Version    string         `yaml:"version"`
+	Identifier string         `yaml:"identifier"`
+	Connection ConnectionKeys `yaml:"connection"`
+	Server     ServerConfig   `yaml:"server"`
+	Peer       *PeerConfig    `yaml:"peer"`
+}
+
+// Connection keys
+type ConnectionKeys struct {
+	Public  string `yaml:"public"`
+	Private string `yaml:"private"`
+}
+
+// Server mode
+type ServerConfig struct {
+	Port      int `yaml:"port"`
+	FrameSize int `yaml:"framesize"`
 }
 
 // Peer mode
 type PeerConfig struct {
+	SupportedProtocols []string `yaml:"supportedProtocols"`
 }
 
 // Create a new base config
 func newBaseConfig() (*DaemonConfig, error) {
-	dc := DaemonConfig{}
+	dc := DaemonConfig{
+		Server:     ServerConfig{},
+		Connection: ConnectionKeys{},
+	}
 
 	dc.Version = VERSION
 
@@ -56,8 +72,12 @@ func newBaseConfig() (*DaemonConfig, error) {
 	}
 
 	// Set key info
-	dc.ConnectionKey = string(publicKeyBytes)
-	dc.ConnectionPrivateKey = string(privateKeyBytes)
+	dc.Connection.Public = string(publicKeyBytes)
+	dc.Connection.Private = string(privateKeyBytes)
+
+	// Other properties
+	dc.Server.Port = 32000
+	dc.Server.FrameSize = 1024
 
 	return &dc, nil
 }
@@ -70,12 +90,13 @@ func NewPeerConfig() (*DaemonConfig, error) {
 	}
 
 	// Add peer config
+	dc.Peer = &PeerConfig{}
 
 	return dc, nil
 }
 
 // Load the config from file
-func LoadConfig(path string) (*DaemonConfig, error) {
+func loadConfig(path string) (*DaemonConfig, error) {
 	dc := DaemonConfig{}
 
 	err := shared.ReadYAML(path, &dc)

@@ -4,18 +4,19 @@ import (
 	"log"
 	"os"
 
+	"github.com/nfwGytautas/ezbin/cli/ezbind/server"
 	"github.com/nfwGytautas/ezbin/shared"
 )
 
 func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-		log.Println("ezbin version: ", VERSION)
+		log.Println("ezbin version: ", server.VERSION)
 		return
 	}
 
 	if len(os.Args) > 1 && (os.Args[1] == "generate-peer") {
 		log.Println("Generating default peer config...")
-		config, err := NewPeerConfig()
+		config, err := server.NewPeerConfig()
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -29,7 +30,7 @@ func main() {
 	}
 
 	log.Println("ezbin daemon starting...")
-	log.Println("version: ", VERSION)
+	log.Println("version: ", server.VERSION)
 
 	configPath := "ezbin.yaml"
 
@@ -49,17 +50,5 @@ func main() {
 		return
 	}
 
-	runDaemon(configPath)
-}
-
-func runDaemon(configPath string) {
-	// Load config
-	config, err := LoadConfig(configPath)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	log.Printf("running %s", config.Identifier)
-
-	// Start the daemon
+	server.RunServer(configPath)
 }

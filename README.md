@@ -9,10 +9,14 @@ Easy configurable self-hosting binary storage
 - [ ] Simple file upload
 - [ ] Versioning
 - [ ] Server daemon
-- [ ] User identity
+- [x] User identity
 - [ ] Publish/Receive package
 
-### v1
+### v2
+
+- [ ] CRC
+
+### v3
 
 - [ ] System architecture-platform dependant
 - [ ] E2E encryption
