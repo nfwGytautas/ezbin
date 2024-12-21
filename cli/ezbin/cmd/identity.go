@@ -7,7 +7,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// scaffoldCmd represents the scaffold command
 var identityCmd = &cobra.Command{
 	Use:   "identity",
 	Short: "Make changes to your identity",
@@ -24,7 +23,7 @@ var checkIdentity = &cobra.Command{
 	Short: "Check your identity",
 	Long:  `Check your identity`,
 	Run: func(cmd *cobra.Command, args []string) {
-		_, err := ez_client.LoadUserIdentity()
+		identity, err := ez_client.LoadUserIdentity()
 		if err != nil {
 			if errors.Is(err, ez_client.ErrIdentityNotFound) {
 				cmd.Println("❌ Identity not found")
@@ -35,6 +34,7 @@ var checkIdentity = &cobra.Command{
 		}
 
 		cmd.Println("✅ Identity loaded successfully")
+		cmd.Println(identity.Identifier)
 	},
 }
 
