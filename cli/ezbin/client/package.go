@@ -102,3 +102,50 @@ func ListPackages(i *UserIdentity) error {
 
 	return nil
 }
+
+func PublishPackage(i *UserIdentity, pck string, version string, peer string) error {
+	fmt.Printf("📦 Publishing package: %v\n", pck)
+
+	if !i.KnowsPeer(peer) {
+		return ErrPeerNotFound
+	}
+
+	currentDir, err := shared.CurrentDirectory()
+	if err != nil {
+		return err
+	}
+
+	pck = strings.ReplaceAll(pck, "/", "")
+	packageDir := currentDir + "/" + pck
+
+	fmt.Printf("Creating package from: %s\n", packageDir)
+
+	// Publish package
+	// Open a connection to peer
+	connData := i.Peers[peer]
+
+	conn, err := connection.ConnectC2P(connection.C2PConnectionParameters{
+		Peer:           connData,
+		UserIdentifier: i.Identifier,
+	})
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	tmpPath := i.PackageDir + "/.ezbin/" + pck + "@" + version + ".tar.gz"
+
+	err = shared.TarCompressDirectory(packageDir, tmpPath)
+	if err != nil {
+		return err
+	}
+
+	err = conn.UploadPackage(pck, version, tmpPath)
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("✅ Package %v published\n", pck)
+
+	return nil
+}

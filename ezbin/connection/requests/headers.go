@@ -12,4 +12,7 @@ var (
 
 	// Packet header
 	HeaderPacket = "PACKET"
+
+	// Upload header
+	HeaderUploadPackage = "PCKG_UPLOAD"
 )

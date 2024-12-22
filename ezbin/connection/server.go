@@ -96,6 +96,61 @@ func (c *serverP2CClient) getHeader() string {
 	return strings.TrimRight(string(header), "\x00")
 }
 
+// Write header to buffer
+func (c *serverP2CClient) writeHeader(header string) error {
+	if len(header) > HEADER_SIZE_BYTES {
+		return errors.ErrHeaderTooLarge
+	}
+
+	// Zero the header range
+	err := shared.WriteSubRange(c.buffer, 0, []byte(strings.Repeat("\x00", HEADER_SIZE_BYTES)))
+	if err != nil {
+		return err
+	}
+
+	err = shared.WriteSubRange(c.buffer, 0, []byte(header))
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Receive packet stream
+func (c *serverP2CClient) receivePacketStream() error {
+	err := c.writeHeader(requests.HeaderPacket)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.conn.Write(c.buffer[:HEADER_SIZE_BYTES])
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Receive packet
+func (c *serverP2CClient) receivePacket() (int, error) {
+	n, err := c.conn.Read(c.buffer)
+	if err != nil {
+		return 0, err
+	}
+
+	header := c.getHeader()
+
+	if header == requests.ERROR_HEADER {
+		return 0, errors.ErrIncorrectHeader
+	}
+
+	if header != requests.HeaderPacket {
+		return 0, errors.ErrIncorrectHeader
+	}
+
+	return n, nil
+}
+
 // Handle incoming request
 func (c *serverP2CClient) handleRequest() error {
 	header := c.getHeader()
@@ -113,6 +168,8 @@ func (c *serverP2CClient) handleRequest() error {
 		return c.packageInfo()
 	case requests.HeaderDownloadPackage:
 		return c.downloadPackage()
+	case requests.HeaderUploadPackage:
+		return c.uploadPackage()
 	}
 
 	log.Println("unknown header received:", header)
@@ -315,6 +372,106 @@ func (c *serverP2CClient) downloadPackage() error {
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// Upload a package
+func (c *serverP2CClient) uploadPackage() error {
+	req := requests.PackageUploadRequest{}
+
+	res := requests.PackageUploadResponse{}
+
+	err := json.Unmarshal(c.buffer[HEADER_SIZE_BYTES:c.numReadBytes], &req)
+	if err != nil {
+		return err
+	}
+
+	packagePath := req.Package
+
+	log.Println("package upload request received:", req)
+
+	// TODO: Prohibit uploading any package starting with '.'
+
+	if c.server.params.PackageDir[0:2] == "./" {
+		cwd, err := shared.CurrentDirectory()
+		if err != nil {
+			return err
+		}
+
+		packagePath = cwd + "/" + c.server.params.PackageDir[2:] + "/" + packagePath
+	} else {
+		packagePath = c.server.params.PackageDir + "/" + packagePath
+	}
+
+	packagePath = packagePath + "/v" + req.Version
+
+	tempPath := c.server.params.PackageDir + "/.ezbin/" // Temporary path
+
+	tempPath = tempPath + req.Package + "@" + req.Version + ".tar.gz"
+
+	// Create file
+	file, err := os.OpenFile(tempPath, os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Send response
+	res.Okay = true
+
+	err = c.writeResponse(res)
+	if err != nil {
+		return err
+	}
+
+	// Wait for start
+	_, err = c.conn.Read(c.buffer)
+	if err != nil {
+		return err
+	}
+
+	header := c.getHeader()
+	if header != requests.HeaderPacket {
+		return errors.ErrIncorrectHeader
+	}
+
+	// Get data
+	err = c.receivePacketStream()
+	if err != nil {
+		return err
+	}
+
+	totalReceivedSum := 0
+	log.Println("receiving package packets...")
+	for i := 0; i < int(req.PacketCount); i++ {
+		n, err := c.receivePacket()
+		if err != nil {
+			// TODO: Error handling, request the same packet again
+			return err
+		}
+
+		totalReceivedSum += n - HEADER_SIZE_BYTES - PACKET_METADATA_SIZE
+		percentage := float64(totalReceivedSum) / float64(req.FullSize) * 100
+		fmt.Printf("received packet: [%v|%v] %vB/%vB %v%%\n", i+1, req.PacketCount, totalReceivedSum, req.FullSize, percentage)
+
+		if n == 0 {
+			break
+		}
+
+		_, err = file.Write(c.buffer[HEADER_SIZE_BYTES+PACKET_METADATA_SIZE : n])
+		if err != nil {
+			return err
+		}
+	}
+
+	file.Close()
+
+	// Untar the package
+	err = shared.TarExtractDirectory(tempPath, packagePath)
+	if err != nil {
+		return err
 	}
 
 	return nil

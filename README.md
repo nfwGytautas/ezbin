@@ -1,16 +1,16 @@
 # EZbin
 
-Easy configurable self-hosting binary storage
+Easy configurable self-hosting binary artifact storage
 
 ## Features
 
 ### v0
 
-- [ ] Simple file upload
+- [x] Simple file upload
 - [x] Versioning
 - [x] Server daemon
 - [x] User identity
-- [ ] Publish/Receive package
+- [x] Publish/Receive package
 
 ### v2
 

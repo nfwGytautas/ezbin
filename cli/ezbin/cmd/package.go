@@ -6,12 +6,18 @@ import (
 )
 
 var packageCmd = &cobra.Command{
-	Use:   "package",
-	Short: "Make changes to received packages",
-	Long:  `Get, remove, or list known packages`,
+	Use:       "package <command>",
+	Short:     "Make changes to your package list",
+	Long:      `Get, remove, or list known packages`,
+	ValidArgs: []string{"get", "remove", "pub", "list"},
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 0 {
 			cmd.Help()
+		}
+
+		err := cmd.ValidateArgs(args)
+		if err != nil {
+			panic(err)
 		}
 	},
 }
@@ -69,9 +75,28 @@ var listCmd = &cobra.Command{
 	},
 }
 
+var pubCmd = &cobra.Command{
+	Use:   "pub <directory|file> <version> <peer>",
+	Short: "Publish a package",
+	Long:  `Publish a package`,
+	Args:  cobra.ExactArgs(3),
+	Run: func(cmd *cobra.Command, args []string) {
+		identity, err := ez_client.LoadUserIdentity()
+		if err != nil {
+			panic(err)
+		}
+
+		err = ez_client.PublishPackage(identity, args[0], args[1], args[2])
+		if err != nil {
+			panic(err)
+		}
+	},
+}
+
 func init() {
 	packageCmd.AddCommand(getCmd)
 	packageCmd.AddCommand(removeCmd)
+	packageCmd.AddCommand(pubCmd)
 	packageCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(packageCmd)
 }

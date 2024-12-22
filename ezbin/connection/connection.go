@@ -96,8 +96,23 @@ func (c *connectionC2P) send(header string, req any) error {
 	return nil
 }
 
-// Start packet stream
-func (c *connectionC2P) startPacketStream() error {
+// Start packet receive stream
+func (c *connectionC2P) receivePacketStream() error {
+	err := c.writeHeader(requests.HeaderPacket)
+	if err != nil {
+		return err
+	}
+
+	_, err = c.conn.Write(c.buffer[:HEADER_SIZE_BYTES])
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Start packet send stream
+func (c *connectionC2P) sendPacketStream() error {
 	err := c.writeHeader(requests.HeaderPacket)
 	if err != nil {
 		return err
@@ -221,7 +236,7 @@ func (c *connectionC2P) DownloadPackage(name string, version string, outDir stri
 	}
 
 	// Notify peer that we are ready to receive packets
-	err = c.startPacketStream()
+	err = c.receivePacketStream()
 	if err != nil {
 		return err
 	}
@@ -272,6 +287,91 @@ func (c *connectionC2P) DownloadPackage(name string, version string, outDir stri
 	err = shared.TarExtractDirectory(filePath, outPath)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// Upload package to peer
+func (c *connectionC2P) UploadPackage(name string, version string, packageFile string) error {
+	req := requests.PackageUploadRequest{
+		Package: name,
+		Version: version,
+	}
+
+	res := requests.PackageUploadResponse{}
+
+	// Get size
+	size, err := shared.FileSize(packageFile)
+	if err != nil {
+		return err
+	}
+
+	req.FullSize = uint64(size)
+
+	// Calculate packet count
+	sendableCount := int64(c.framesize - HEADER_SIZE_BYTES - PACKET_METADATA_SIZE)
+	req.PacketCount = uint32(size / sendableCount)
+
+	if size%sendableCount != 0 {
+		req.PacketCount++
+	}
+
+	err = c.send(requests.HeaderUploadPackage, req)
+	if err != nil {
+		return err
+	}
+
+	err = c.receive(&res)
+	if err != nil {
+		return err
+	}
+
+	if !res.Okay {
+		return errors.ErrUploadFailed
+	}
+
+	// Notify peer that we are ready to send packets
+	err = c.sendPacketStream()
+	if err != nil {
+		return err
+	}
+
+	// Wait for start
+	_, err = c.conn.Read(c.buffer)
+	if err != nil {
+		return err
+	}
+
+	header := c.getHeader()
+	if header != requests.HeaderPacket {
+		return errors.ErrIncorrectHeader
+	}
+
+	// Open the file
+	file, err := os.OpenFile(packageFile, os.O_RDONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	fmt.Println("Uploading package:", name)
+
+	totalSentSum := 0
+	for i := 0; i < int(req.PacketCount); i++ {
+		n, err := file.Read(c.buffer[HEADER_SIZE_BYTES+PACKET_METADATA_SIZE:])
+		if err != nil {
+			return err
+		}
+
+		totalSentSum += n
+		percentage := float64(totalSentSum) / float64(req.FullSize) * 100
+		fmt.Printf("[%v|%v] Sent %vB/%vB %v%%\n", i+1, req.PacketCount, totalSentSum, req.FullSize, percentage)
+
+		_, err = c.conn.Write(c.buffer[:HEADER_SIZE_BYTES+PACKET_METADATA_SIZE+n])
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
