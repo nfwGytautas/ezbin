@@ -12,21 +12,22 @@ Easy configurable self-hosting binary artifact storage
 - [x] User identity
 - [x] Publish/Receive package
 
-### v2
+### v1
 
 - [ ] CRC/MD5
+- [ ] E2E encryption
+- [ ] System architecture-platform dependant
+
+### v2
+
+- [ ] Cleanup the code structure
 - [ ] Error robustness
 
 ### v3
 
-- [ ] System architecture-platform dependant
-- [ ] E2E encryption
-
-### v4
-
 - [ ] Unit tests
 
-### v5
+### v4
 
 - [ ] apt/brew/web install (make it ez)
 
