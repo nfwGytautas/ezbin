@@ -42,5 +42,11 @@ func initPackageDirectory(config *DaemonConfig) error {
 		return err
 	}
 
+	// Create directory
+	err = shared.CreateDirectory(config.Storage.Location + "/.ezbin")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

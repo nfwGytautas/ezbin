@@ -11,11 +11,13 @@ import (
 )
 
 const IDENTITY_FILE = ".ezbin.identity.json"
+const PACKAGE_DIR = ".ezbin"
 
 // UserIdentity is a struct that represents a user's identity
 type UserIdentity struct {
 	Version      string                                   `json:"version"`
 	Identifier   string                                   `json:"identifier"`
+	PackageDir   string                                   `json:"packageDir"`
 	ProtocolInfo map[string]protocol.ProtocolData         `json:"protocolData"`
 	Peers        map[string]connection.PeerConnectionData `json:"Peers"`
 }
@@ -84,6 +86,15 @@ func GenerateUserIdentity() (*UserIdentity, error) {
 		identity.ProtocolInfo[protocol.Name()] = data
 	}
 
+	// Package directory
+	homeDir, err := shared.HomeDirectory()
+	if err != nil {
+		return nil, err
+	}
+
+	identity.PackageDir = homeDir + "/" + PACKAGE_DIR + "/" + identity.Identifier
+
+	// Save
 	err = identity.Save()
 	if err != nil {
 		return nil, err

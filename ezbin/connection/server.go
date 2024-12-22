@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -80,10 +81,7 @@ func (c *serverP2CClient) handleConnection(conn net.Conn) {
 		c.numReadBytes = n
 
 		// Unmarshal the handshake request
-		header := c.buffer[:HEADER_SIZE_BYTES]
-		headerString := string(header)
-
-		err = c.handleRequest(headerString)
+		err = c.handleRequest()
 		if err != nil {
 			// TODO: Error handling
 			log.Println(err)
@@ -92,21 +90,29 @@ func (c *serverP2CClient) handleConnection(conn net.Conn) {
 	}
 }
 
+// Get header from buffer
+func (c *serverP2CClient) getHeader() string {
+	header := c.buffer[:HEADER_SIZE_BYTES]
+	return strings.TrimRight(string(header), "\x00")
+}
+
 // Handle incoming request
-func (c *serverP2CClient) handleRequest(header string) error {
-	trimmed := strings.TrimRight(header, "\x00")
+func (c *serverP2CClient) handleRequest() error {
+	header := c.getHeader()
 
 	if !c.handshakeFinished {
-		if trimmed != requests.HeaderHandshake {
+		if header != requests.HeaderHandshake {
 			return errors.ErrHandshakeNotFinished
 		}
 
 		return c.handshake()
 	}
 
-	switch trimmed {
+	switch header {
 	case requests.HeaderPackageInfo:
 		return c.packageInfo()
+	case requests.HeaderDownloadPackage:
+		return c.downloadPackage()
 	}
 
 	log.Println("unknown header received:", header)
@@ -213,6 +219,102 @@ func (c *serverP2CClient) packageInfo() error {
 	err = c.writeResponse(res)
 	if err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// Download a package
+func (c *serverP2CClient) downloadPackage() error {
+	req := requests.PackageDownloadRequest{}
+
+	res := requests.PackageDownloadResponse{}
+
+	err := json.Unmarshal(c.buffer[HEADER_SIZE_BYTES:c.numReadBytes], &req)
+	if err != nil {
+		return err
+	}
+
+	packagePath := req.Package
+
+	log.Println("package download request received:", req)
+
+	// TODO: Prohibit getting any package starting with '.'
+
+	if c.server.params.PackageDir[0:2] == "./" {
+		cwd, err := shared.CurrentDirectory()
+		if err != nil {
+			return err
+		}
+
+		packagePath = cwd + "/" + c.server.params.PackageDir[2:] + "/" + packagePath
+	} else {
+		packagePath = c.server.params.PackageDir + "/" + packagePath
+	}
+
+	packagePath = packagePath + "/v" + req.Version
+
+	tempPath := c.server.params.PackageDir + "/.ezbin/" // Temporary path
+
+	// Prepare package by tarring/zipping it
+	tempPath = tempPath + req.Package + "@" + req.Version + ".tar.gz"
+	err = shared.TarCompressDirectory(packagePath, tempPath)
+	if err != nil {
+		return err
+	}
+
+	// Get package info
+	size, err := shared.FileSize(tempPath)
+	if err != nil {
+		return err
+	}
+
+	sendableCount := int64(c.server.params.FrameSize - HEADER_SIZE_BYTES - PACKET_METADATA_SIZE)
+
+	res.Okay = true
+	res.PacketCount = uint32(size / sendableCount)
+	res.FullSize = uint64(size)
+
+	if size%sendableCount != 0 {
+		res.PacketCount++
+	}
+
+	err = c.writeResponse(res)
+	if err != nil {
+		return err
+	}
+
+	// Wait for start
+	_, err = c.conn.Read(c.buffer)
+	if err != nil {
+		return err
+	}
+
+	header := c.getHeader()
+	if header != requests.HeaderPacket {
+		return errors.ErrIncorrectHeader
+	}
+
+	// Open the file
+	file, err := os.OpenFile(tempPath, os.O_RDONLY, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	// Start packet stream
+	log.Printf("sending %v packets", res.PacketCount)
+	for i := 0; i < int(res.PacketCount); i++ {
+		n, err := file.Read(c.buffer[HEADER_SIZE_BYTES+PACKET_METADATA_SIZE:])
+		if err != nil {
+			return err
+		}
+
+		log.Printf("sending packet: [%v/%v] size (no header): %v for %s", i+1, res.PacketCount, n, c.clientIdentity)
+		_, err = c.conn.Write(c.buffer[:HEADER_SIZE_BYTES+PACKET_METADATA_SIZE+n])
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

@@ -27,6 +27,16 @@ func FileExists(path string) (bool, error) {
 	return true, nil
 }
 
+// Get the size of the file
+func FileSize(path string) (int64, error) {
+	info, err := os.Stat(path)
+	if err != nil {
+		return 0, err
+	}
+
+	return info.Size(), nil
+}
+
 // Read a json file and parse it
 func ReadJson(path string, data interface{}) error {
 	file, err := os.Open(path)

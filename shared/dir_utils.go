@@ -73,3 +73,29 @@ func GetDirectorySize(path string) (int64, error) {
 
 	return size, nil
 }
+
+// Get all subdirectories
+func GetSubdirectories(path string) ([]string, error) {
+	entries, err := os.ReadDir(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var directories []string
+	for _, entry := range entries {
+		if entry.IsDir() {
+			directories = append(directories, entry.Name())
+		}
+	}
+	return directories, nil
+}
+
+// Delete a directory
+func DeleteDirectory(path string) error {
+	err := os.RemoveAll(path)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -6,4 +6,10 @@ var (
 
 	// Package info request header
 	HeaderPackageInfo = "PCKG_INFO"
+
+	// Download package request header
+	HeaderDownloadPackage = "PCKG_DWNLD"
+
+	// Packet header
+	HeaderPacket = "PACKET"
 )

@@ -11,3 +11,6 @@ const HANDSHAKE_BUFFER_SIZE = 1024
 
 // Timeout in seconds for handshake request
 const HANDSHAKE_READ_TIMEOUT = time.Second * 5
+
+// Packet info
+const PACKET_METADATA_SIZE = 32 + 32 // 32 bytes for packet index, 32 bytes for size

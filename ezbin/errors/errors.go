@@ -9,4 +9,5 @@ var (
 	ErrIncorrectHeader      = errors.New("incorrect header")
 	ErrHandshakeFailed      = errors.New("handshake failed")
 	ErrHandshakeNotFinished = errors.New("handshake not finished")
+	ErrBufferTooSmall       = errors.New("buffer too small")
 )
