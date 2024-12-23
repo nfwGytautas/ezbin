@@ -19,8 +19,11 @@ jobs:
       - name: Install dependencies
         run: go mod download
 
-      - name: Build binary
-        run: go build -o out/ezbin
+      - name: Build daemon
+        run: go build -o out/ezbind ./cmd/ezbind
+
+      - name: Build client
+        run: go build -o out/ezbin ./cmd/ezbin
 
       - name: Run tests
         run: go test -v ./...
