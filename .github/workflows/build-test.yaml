@@ -20,10 +20,10 @@ jobs:
         run: go mod download
 
       - name: Build daemon
-        run: go build -o out/ezbind ./cmd/ezbind
+        run: go build -o out/ezbind ./cli/ezbind
 
       - name: Build client
-        run: go build -o out/ezbin ./cmd/ezbin
+        run: go build -o out/ezbin ./cli/ezbin
 
       - name: Run tests
         run: go test -v ./...
