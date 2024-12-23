@@ -1,0 +1,42 @@
+version: 0.1.0
+identifier: 0193ead4-653d-770c-a08f-670c72d501cb
+connection:
+    public: |
+        MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA59hDoFQIW6KS9AUXdkRiEklzL2
+        IkENNi1Ao3oZ4pvCzH5+amuY5oqG1s4OaYwZ5Qlc89bZ2j/nrllTxMhjImlgv5s+u4l38i
+        5UhcF1wWChvtjEKwWfn7T1M/IHVATeAQ28MTU08TFupwfWVmMPH9JpGqPnt6DejEOtfJfi
+        XT7ki9vRKcGn+qOJ4hJarnJShKINvEI6VKT5zdTTbWLHNngjkJBrSM/qjMhYFAJKpAfc1J
+        aB8VFNC/d/v1LNJhjTDx7VPNAu+cf2T3Bk4qt3uwHCQHAa2TaCgh19uIfZRU9Se3NMEe5G
+        JoPjXspUvuER6RcKMAuNzjMNp3MVydyFYHlQIDAQAB
+    private: |
+        MIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDn2EOgVAhbopL0BRd2RG
+        ISSXMvYiQQ02LUCjehnim8LMfn5qa5jmiobWzg5pjBnlCVzz1tnaP+euWVPEyGMiaWC/mz
+        67iXfyLlSFwXXBYKG+2MQrBZ+ftPUz8gdUBN4BDbwxNTTxMW6nB9ZWYw8f0mkao+e3oN6M
+        Q618l+JdPuSL29Epwaf6o4niElquclKEog28QjpUpPnN1NNtYsc2eCOQkGtIz+qMyFgUAk
+        qkB9zUloHxUU0L93+/Us0mGNMPHtU80C75x/ZPcGTiq3e7AcJAcBrZNoKCHX24h9lFT1J7
+        c0wR7kYmg+NeylS+4RHpFwowC43OMw2ncxXJ3IVgeVAgMBAAECggEAeAukyIl6YmhFixBv
+        248A8NMTTz+TyRqLG5vGvmp01biiMdNeFMpGKp+uNq1v/yEIPOm3tuBfH89mvOUiAoJJNH
+        wy6RRu2hK8cNgMxxOpXcakM3H8ejpUA/jowNe1Wh1g3Ume4g4Zpk3xvRwZ09IY8DWQXxX0
+        VutlX8qHzEet+ry3HpFfici1erxvdsZDDh55QOa41GTfiX+lS60CspPpaojIGRPtpx9RF2
+        LIpqMSnrRS6rcNadrD2ZDAGljIMh6OtQ8Pfshjeccxj4zSj+uq9yYAoGGUxjsyjKzxvpOg
+        G8h9on2kA9oAVjZ9PwHZZw7eh3/S5ZKTuta5fpuJ6Rqi6QKBgQD3pSjpnBZvskPzqaF/GV
+        KATwkdJkYy/6vXDcHxEt3m6v8CftUSQEsqS98RuXuBOHxSmW7gmiH/FHMzFMH7ozCKqL8M
+        ZoR9+mZbirU0h8tpeba0qRxKto28AU0RQM2xLEG7d6Wbi2t9MiWl7ImR/a6XlY/eedlYBl
+        F3FpcE1lnhbwKBgQDvqqQcLWLSXFUfJEVxfQ9S9c7lu5bq57gPj/boB7cO7bmuZvNUdQe8
+        Rul47Zs4oEpbvS+y1df5dvK1m5xSN5/NlVG97S+cGLt4YdqzIQ0m0pS7x19/4zKtHYUMMN
+        xv2x7LY5SANoiIN+dFVmBf11MGaAKYHnkGYU00JgURuIKdOwKBgQDufE43EssEjA8mc0CE
+        TtWFnRdwy/AkotVQx/3ydDHgdIRaWdxFtEbul5xdzFsk6UnIndwKTkTZCk+abK4W8GQJ1F
+        IP1hZX37F9DMpOqUt56u3Jc2Y8iStbV4FpURgFPFKc/68raQt9yLI65NzjDAN8FVs0a/Gj
+        9Im1frq2vNpX3wKBgQCUKXbI4Jn+GAybcu3nSfvmOoXMahrTX6rfHA30xYg6l2Y51fVJ2g
+        uNLn15P9K8wAMYEa3iLecVlp5W/Ts3bKHDEzN0aaQMKRIESuJL6Pvba0V9jLSSOB+E/AHb
+        Vn2APQMdk5MjbBMduwmjSNHNji0KgdRQvE3vTsnOmk559QnyLwKBgQCo81VBRb+c3h668c
+        xEItSU+97crVUJuhRRyVCGzXtcHHGoCnBiB8nij9Bl0/n9sLq17Zqe5lM51BlRU4ZnQNhH
+        Xi6hVY20DPP6Ro6mbFu18dbas96rpHzX3d6qV1dcjgZ4IKM4dzcLYfIjUqUdMSk7i3+8Sd
+        Ya9c0t0Qug5ytVVg==
+server:
+    port: 32000
+    framesize: 4096
+storage:
+    location: ./examples/packages
+peer:
+    protocol: "noop"

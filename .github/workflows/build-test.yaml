@@ -1,0 +1,29 @@
+name: Build and test
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-go@v2
+        with:
+          go-version: 1.23
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Build daemon
+        run: go build -o out/ezbind ./cli/ezbind
+
+      - name: Build client
+        run: go build -o out/ezbin ./cli/ezbin
+
+      - name: Run tests
+        run: go test -v ./...
