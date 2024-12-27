@@ -5,12 +5,14 @@ import (
 	"os"
 
 	"github.com/nfwGytautas/ezbin/cli/ezbind/server"
+	"github.com/nfwGytautas/ezbin/ezbin"
+	ezbin_server "github.com/nfwGytautas/ezbin/ezbin/server"
 	"github.com/nfwGytautas/ezbin/shared"
 )
 
 func main() {
 	if len(os.Args) > 1 && (os.Args[1] == "-v" || os.Args[1] == "--version") {
-		log.Println("ezbin version: ", server.VERSION)
+		log.Println("ezbin version: ", ezbin.VERSION)
 		return
 	}
 
@@ -29,9 +31,6 @@ func main() {
 		return
 	}
 
-	log.Println("ezbin daemon starting...")
-	log.Println("version: ", server.VERSION)
-
 	configPath := "ezbin.yaml"
 
 	if len(os.Args) > 1 {
@@ -43,6 +42,7 @@ func main() {
 	exists, err := shared.FileExists(configPath)
 	if err != nil {
 		log.Fatal(err)
+		return
 	}
 
 	if !exists {
@@ -50,5 +50,13 @@ func main() {
 		return
 	}
 
-	server.RunServer(configPath)
+	cfg, err := ezbin.LoadDaemonConfig(configPath)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	err = ezbin_server.New(*cfg).Run()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
