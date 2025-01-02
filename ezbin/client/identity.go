@@ -216,12 +216,12 @@ func (ui *UserIdentity) CheckPeers() {
 		connection, err := ui.connectToPeer(
 			peer,
 		)
-		defer connection.Close()
-
 		if err != nil {
 			fmt.Printf("	- %s: ❌ %s\n", peer, err)
 			continue
 		}
+
+		defer connection.Close()
 
 		fmt.Printf("	- %s: ✅\n", peer)
 	}
@@ -369,6 +369,7 @@ func (ui *UserIdentity) connectToPeer(peer string) (*client2P, error) {
 	// Handshake with the peer
 	err = c.handshake(ui.Identifier, connData.Key)
 	if err != nil {
+		conn.Close()
 		return nil, err
 	}
 
