@@ -1,83 +1,29 @@
-package client
+package ezbin_client
 
 import (
 	"fmt"
 	"net"
 	"os"
 
+	"github.com/nfwGytautas/ezbin/ezbin"
 	"github.com/nfwGytautas/ezbin/ezbin/connection"
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
-	"github.com/nfwGytautas/ezbin/ezbin/errors"
 	"github.com/nfwGytautas/ezbin/shared"
 )
 
-// PeerConnectionData is a struct that represents a peer's connection data
-type PeerConnectionData struct {
-	// Address of the peer
-	Address string
-
-	// Connection key of the peer
-	ConnectionKey string
-}
-
-// Arguments for connect function
-type C2PConnectionParameters struct {
-	// Peer address
-	Peer PeerConnectionData
-
-	// User identifier
-	UserIdentifier string
-}
-
-// Connection between client and peer
-type ConnectionC2P struct {
-	conn   net.Conn
-	params C2PConnectionParameters
-
+type client2P struct {
+	conn      net.Conn
 	frame     *connection.Frame
 	framesize int
 }
 
-// Connect client to a peer
-func Create(args C2PConnectionParameters) (*ConnectionC2P, error) {
-	conn := ConnectionC2P{
-		params: args,
-	}
-
-	err := conn.open()
-	if err != nil {
-		return nil, err
-	}
-
-	return &conn, nil
-}
-
-// Open a tcp connection to a peer
-func (c *ConnectionC2P) open() error {
-	conn, err := net.Dial("tcp", c.params.Peer.Address)
-	if err != nil {
-		return err
-	}
-
-	c.conn = conn
-	c.frame = connection.NewFrame(conn, make([]byte, connection.HANDSHAKE_BUFFER_SIZE))
-
-	// Handshake with the peer
-	err = c.handshake()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // Close the connection
-func (c *ConnectionC2P) Close() {
+func (c *client2P) Close() {
 	c.conn.Close()
 }
 
 // Send data to the peer
-func (c *ConnectionC2P) send(header string, req any) error {
+func (c *client2P) send(header string, req any) error {
 	err := c.frame.SetHeader(header)
 	if err != nil {
 		return err
@@ -97,7 +43,7 @@ func (c *ConnectionC2P) send(header string, req any) error {
 }
 
 // Start packet receive stream
-func (c *ConnectionC2P) startPacketStream() error {
+func (c *client2P) startPacketStream() error {
 	err := c.frame.SetHeader(requests.HeaderPacket)
 	if err != nil {
 		return err
@@ -112,7 +58,7 @@ func (c *ConnectionC2P) startPacketStream() error {
 }
 
 // Receive data from peer
-func (c *ConnectionC2P) receive(res any) error {
+func (c *client2P) receive(res any) error {
 	err := c.frame.Read()
 	if err != nil {
 		return err
@@ -121,7 +67,7 @@ func (c *ConnectionC2P) receive(res any) error {
 	header := c.frame.GetHeader()
 
 	if header == requests.ERROR_HEADER {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	err = c.frame.ToJSON(res)
@@ -133,7 +79,7 @@ func (c *ConnectionC2P) receive(res any) error {
 }
 
 // Receive packet from peer
-func (c *ConnectionC2P) receivePacket() error {
+func (c *client2P) receivePacket() error {
 	err := c.frame.Read()
 	if err != nil {
 		return err
@@ -142,20 +88,20 @@ func (c *ConnectionC2P) receivePacket() error {
 	header := c.frame.GetHeader()
 
 	if header == requests.ERROR_HEADER {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	if header != requests.HeaderPacket {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	return err
 }
 
 // Handshake with the peer
-func (c *ConnectionC2P) handshake() error {
+func (c *client2P) handshake(identifier string, key string) error {
 	req := requests.HandshakeRequest{
-		UserIdentifier: c.params.UserIdentifier,
+		UserIdentifier: identifier,
 	}
 
 	res := requests.HandshakeResponse{}
@@ -171,7 +117,7 @@ func (c *ConnectionC2P) handshake() error {
 	}
 
 	if res.Okay == false {
-		return errors.ErrHandshakeFailed
+		return ezbin.ErrHandshakeFailed
 	}
 
 	c.frame = connection.NewFrame(c.conn, make([]byte, res.Framesize))
@@ -181,7 +127,7 @@ func (c *ConnectionC2P) handshake() error {
 }
 
 // Get package info from peer
-func (c *ConnectionC2P) GetPackageInfo(name string) (*requests.PackageInfoResponse, error) {
+func (c *client2P) GetPackageInfo(name string) (*requests.PackageInfoResponse, error) {
 	req := requests.PackageInfoRequest{
 		Package: name,
 	}
@@ -202,7 +148,7 @@ func (c *ConnectionC2P) GetPackageInfo(name string) (*requests.PackageInfoRespon
 }
 
 // Download package from peer
-func (c *ConnectionC2P) DownloadPackage(name string, version string, outDir string, info *requests.PackageInfoResponse) error {
+func (c *client2P) DownloadPackage(name string, version string, outDir string, info *requests.PackageInfoResponse) error {
 	req := requests.PackageDownloadRequest{
 		Package: name,
 		Version: version,
@@ -278,7 +224,7 @@ func (c *ConnectionC2P) DownloadPackage(name string, version string, outDir stri
 }
 
 // Upload package to peer
-func (c *ConnectionC2P) UploadPackage(name string, version string, packageFile string) error {
+func (c *client2P) UploadPackage(name string, version string, packageFile string) error {
 	req := requests.PackageUploadRequest{
 		Package: name,
 		Version: version,
@@ -313,7 +259,7 @@ func (c *ConnectionC2P) UploadPackage(name string, version string, packageFile s
 	}
 
 	if !res.Okay {
-		return errors.ErrUploadFailed
+		return ezbin.ErrUploadFailed
 	}
 
 	// Notify peer that we are ready to send packets
@@ -330,7 +276,7 @@ func (c *ConnectionC2P) UploadPackage(name string, version string, packageFile s
 
 	header := c.frame.GetHeader()
 	if header != requests.HeaderPacket {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	// Open the file

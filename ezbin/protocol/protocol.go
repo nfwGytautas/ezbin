@@ -13,3 +13,22 @@ type SRProtocol interface {
 }
 
 type ProtocolData = map[string]string
+
+// Get all supported protocols
+func GetSupportedProtocols() []SRProtocol {
+	return []SRProtocol{
+		&ECDSAProtocol{},
+		&RSAProtocol{},
+		&NoopProtocol{},
+	}
+}
+
+// Get a protocol by name
+func GetProtocolByName(name string) SRProtocol {
+	for _, p := range GetSupportedProtocols() {
+		if p.Name() == name {
+			return p
+		}
+	}
+	return nil
+}

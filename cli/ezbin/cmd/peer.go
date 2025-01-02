@@ -3,7 +3,7 @@ package cmd
 import (
 	"fmt"
 
-	ez_client "github.com/nfwGytautas/ezbin/cli/ezbin/client"
+	ezbin_client "github.com/nfwGytautas/ezbin/ezbin/client"
 	"github.com/spf13/cobra"
 )
 
@@ -30,7 +30,7 @@ var peerAddCmd = &cobra.Command{
 			return
 		}
 
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -52,7 +52,7 @@ var peerRemoveCmd = &cobra.Command{
 	Long:  `Remove a peer from your known peers list`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -73,7 +73,7 @@ var peerListCmd = &cobra.Command{
 	Short: "List all known peers",
 	Long:  `List all known peers`,
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			fmt.Println(err)
 			return
@@ -88,7 +88,7 @@ var peerCheckCmd = &cobra.Command{
 	Short: "Check the peer list",
 	Long:  `Ping all peers and check which of them respond`,
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			fmt.Println(err)
 			return

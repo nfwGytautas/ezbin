@@ -3,7 +3,8 @@ package cmd
 import (
 	"errors"
 
-	ez_client "github.com/nfwGytautas/ezbin/cli/ezbin/client"
+	"github.com/nfwGytautas/ezbin/ezbin"
+	ezbin_client "github.com/nfwGytautas/ezbin/ezbin/client"
 	"github.com/spf13/cobra"
 )
 
@@ -23,9 +24,9 @@ var checkIdentity = &cobra.Command{
 	Short: "Check your identity",
 	Long:  `Check your identity`,
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
-			if errors.Is(err, ez_client.ErrIdentityNotFound) {
+			if errors.Is(err, ezbin.ErrIdentityNotFound) {
 				cmd.Println("❌ Identity not found")
 			} else {
 				cmd.Println("❌ Error loading identity: ", err)
@@ -44,7 +45,7 @@ var generateIdentity = &cobra.Command{
 	Long:  `Generate a new identity`,
 	Run: func(cmd *cobra.Command, args []string) {
 		// Check if we already have a user identity
-		_, err := ez_client.LoadUserIdentity()
+		_, err := ezbin_client.LoadUserIdentity()
 		if err == nil {
 			confirmed, err := promptConfirmation("❗️ You already have an identity. Are you sure you want to generate a new one?")
 			if err != nil || !confirmed {
@@ -53,7 +54,7 @@ var generateIdentity = &cobra.Command{
 			}
 		}
 
-		_, err = ez_client.GenerateUserIdentity()
+		_, err = ezbin_client.GenerateUserIdentity()
 		if err != nil {
 			cmd.Println("❌ Error generating identity: ", err)
 			return

@@ -1,4 +1,4 @@
-package server_internal
+package ezbin_server
 
 import (
 	"io"
@@ -9,13 +9,12 @@ import (
 	"github.com/nfwGytautas/ezbin/ezbin"
 	"github.com/nfwGytautas/ezbin/ezbin/connection"
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
-	"github.com/nfwGytautas/ezbin/ezbin/errors"
 )
 
 // TODO: Protocol
 
 type serverP2CClient struct {
-	config *ezbin.DaemonConfig
+	config *DaemonConfig
 	conn   net.Conn
 
 	clientIdentity    string
@@ -24,7 +23,7 @@ type serverP2CClient struct {
 }
 
 // Create new server client
-func Handle(conn net.Conn, config *ezbin.DaemonConfig) {
+func handleNewConnection(conn net.Conn, config *DaemonConfig) {
 	client := &serverP2CClient{
 		config:            config,
 		conn:              conn,
@@ -94,11 +93,11 @@ func (c *serverP2CClient) receivePacket() error {
 	header := c.frame.GetHeader()
 
 	if header == requests.ERROR_HEADER {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	if header != requests.HeaderPacket {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	return nil
@@ -110,7 +109,7 @@ func (c *serverP2CClient) handleRequest() error {
 
 	if !c.handshakeFinished {
 		if header != requests.HeaderHandshake {
-			return errors.ErrHandshakeNotFinished
+			return ezbin.ErrHandshakeNotFinished
 		}
 
 		return c.handshake()
@@ -126,5 +125,5 @@ func (c *serverP2CClient) handleRequest() error {
 	}
 
 	log.Println("unknown header received:", header)
-	return errors.ErrUnknownHeader
+	return ezbin.ErrUnknownHeader
 }

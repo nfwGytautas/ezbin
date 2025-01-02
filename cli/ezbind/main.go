@@ -50,12 +50,12 @@ func main() {
 		return
 	}
 
-	cfg, err := ezbin.LoadDaemonConfig(configPath)
+	cfg, err := ezbin_server.LoadDaemonConfig(configPath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = ezbin_server.New(*cfg).Run()
+	err = cfg.Run()
 	if err != nil {
 		log.Fatal(err)
 	}

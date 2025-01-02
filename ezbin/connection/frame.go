@@ -6,7 +6,7 @@ import (
 	"net"
 	"strings"
 
-	"github.com/nfwGytautas/ezbin/ezbin/errors"
+	"github.com/nfwGytautas/ezbin/ezbin"
 )
 
 // Frame is a struct that represents a ezbin tcp frame
@@ -42,7 +42,7 @@ func (f *Frame) Read() error {
 // Write the frame to the connection
 func (f *Frame) Write() error {
 	if f.writeSize == 0 {
-		return errors.ErrNothingToWrite
+		return ezbin.ErrNothingToWrite
 	}
 
 	_, err := f.conn.Write(f.buffer[:f.writeSize])
@@ -90,7 +90,7 @@ func (f *Frame) GetHeader() string {
 // Write the header to the frame
 func (f *Frame) SetHeader(header string) error {
 	if len(header) > HEADER_SIZE_BYTES {
-		return errors.ErrHeaderTooLarge
+		return ezbin.ErrHeaderTooLarge
 	}
 
 	headerBin := strings.Repeat("\x00", HEADER_SIZE_BYTES)
@@ -118,7 +118,7 @@ func (f *Frame) TransferToWriter(w io.Writer) error {
 // Read from a frame to a generic reader interface
 func (f *Frame) TransferFromReader(r io.Reader, start int) error {
 	if start < 0 {
-		return errors.ErrInvalidStart
+		return ezbin.ErrInvalidStart
 	}
 
 	n, err := r.Read(f.buffer[HEADER_SIZE_BYTES+start:])
@@ -146,7 +146,7 @@ func (f *Frame) GetNumReadBytes() int {
 // Write a range to the frame
 func (f *Frame) writeRange(start int, data []byte) error {
 	if len(data) > len(f.buffer)-start {
-		return errors.ErrBufferTooSmall
+		return ezbin.ErrBufferTooSmall
 	}
 
 	if len(data) == 0 {

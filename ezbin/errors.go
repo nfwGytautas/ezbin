@@ -1,4 +1,4 @@
-package errors
+package ezbin
 
 import "errors"
 
@@ -14,4 +14,9 @@ var (
 	ErrNothingToWrite       = errors.New("nothing to write")
 	ErrInvalidStart         = errors.New("invalid start")
 	ErrInvalidConfig        = errors.New("invalid config")
+	ErrIdentityNotFound     = errors.New("identity not found")
+	ErrPeerNotFound         = errors.New("peer not found")
+	ErrPeerExists           = errors.New("peer already exists")
+	ErrPackageNotFound      = errors.New("package not found")
+	ErrExceededFrameSize    = errors.New("exceeded frame size")
 )

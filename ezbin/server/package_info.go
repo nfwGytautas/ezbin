@@ -1,4 +1,4 @@
-package server_internal
+package ezbin_server
 
 import (
 	"log"

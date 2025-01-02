@@ -1,7 +1,7 @@
 package cmd
 
 import (
-	ez_client "github.com/nfwGytautas/ezbin/cli/ezbin/client"
+	ezbin_client "github.com/nfwGytautas/ezbin/ezbin/client"
 	"github.com/spf13/cobra"
 )
 
@@ -28,12 +28,12 @@ var getCmd = &cobra.Command{
 	Long:  `Get a package`,
 	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			panic(err)
 		}
 
-		err = ez_client.GetPackage(identity, args[1], args[0])
+		err = identity.GetPackage(args[1], args[0])
 		if err != nil {
 			panic(err)
 		}
@@ -46,12 +46,12 @@ var removeCmd = &cobra.Command{
 	Long:  `Remove a package`,
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			panic(err)
 		}
 
-		err = ez_client.RemovePackage(identity, args[0])
+		err = identity.RemovePackage(args[0])
 		if err != nil {
 			panic(err)
 		}
@@ -63,12 +63,12 @@ var listCmd = &cobra.Command{
 	Short: "List all known packages",
 	Long:  `List all known packages`,
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			panic(err)
 		}
 
-		err = ez_client.ListPackages(identity)
+		err = identity.ListPackages()
 		if err != nil {
 			panic(err)
 		}
@@ -81,12 +81,12 @@ var pubCmd = &cobra.Command{
 	Long:  `Publish a package`,
 	Args:  cobra.ExactArgs(3),
 	Run: func(cmd *cobra.Command, args []string) {
-		identity, err := ez_client.LoadUserIdentity()
+		identity, err := ezbin_client.LoadUserIdentity()
 		if err != nil {
 			panic(err)
 		}
 
-		err = ez_client.PublishPackage(identity, args[0], args[1], args[2])
+		err = identity.PublishPackage(args[0], args[1], args[2])
 		if err != nil {
 			panic(err)
 		}

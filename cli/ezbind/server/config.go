@@ -1,12 +1,12 @@
 package server
 
 import (
-	"github.com/nfwGytautas/ezbin/ezbin"
+	ezbin_server "github.com/nfwGytautas/ezbin/ezbin/server"
 )
 
 // Create a new default peer config
-func NewPeerConfig() (*ezbin.DaemonConfig, error) {
-	dc, err := ezbin.NewDefaultDaemonConfig()
+func NewPeerConfig() (*ezbin_server.DaemonConfig, error) {
+	dc, err := ezbin_server.NewDefaultDaemonConfig()
 	if err != nil {
 		return nil, err
 	}

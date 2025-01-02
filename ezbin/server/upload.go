@@ -1,12 +1,12 @@
-package server_internal
+package ezbin_server
 
 import (
 	"fmt"
 	"log"
 	"os"
 
+	"github.com/nfwGytautas/ezbin/ezbin"
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
-	"github.com/nfwGytautas/ezbin/ezbin/errors"
 	"github.com/nfwGytautas/ezbin/shared"
 )
 
@@ -71,7 +71,7 @@ func (c *serverP2CClient) uploadPackage() error {
 
 	header := c.frame.GetHeader()
 	if header != requests.HeaderPacket {
-		return errors.ErrIncorrectHeader
+		return ezbin.ErrIncorrectHeader
 	}
 
 	// Get data
