@@ -3,36 +3,34 @@ package connection
 import (
 	"encoding/json"
 	"io"
+	"log"
 	"net"
 	"strings"
 
 	"github.com/nfwGytautas/ezbin/ezbin"
-	"github.com/nfwGytautas/ezbin/ezbin/protocol"
 )
+
+type DecryptFn func([]byte) ([]byte, error)
+type EncryptFn func([]byte) ([]byte, error)
 
 // Frame is a struct that represents a ezbin tcp frame
 type Frame struct {
+	Debug bool
+
 	conn   net.Conn
 	buffer []byte
 
 	lastReadBytes int
 	writeSize     int
-
-	protocol protocol.Protocol
 }
 
 // NewFrame creates a new frame
 func NewFrame(conn net.Conn, buffer []byte) *Frame {
 	return &Frame{
-		conn:     conn,
-		buffer:   buffer,
-		protocol: nil,
+		conn:   conn,
+		buffer: buffer,
+		Debug:  true,
 	}
-}
-
-// Set a protocol for the frame
-func (f *Frame) SetProtocol(protocol protocol.Protocol) {
-	f.protocol = protocol
 }
 
 // Read the frame from the connection
@@ -45,16 +43,20 @@ func (f *Frame) Read() error {
 	f.lastReadBytes = n
 	f.writeSize = 0
 
-	// Decrypt if protocol is set
-	if f.protocol != nil {
-		decryptedData, err := f.protocol.Decrypt(f.buffer[:f.lastReadBytes])
-		if err != nil {
-			return err
-		}
+	f.debugMessageF("Read %d bytes", n)
 
-		copy(f.buffer, decryptedData)
-		f.lastReadBytes = len(decryptedData)
+	return nil
+}
+
+// Decrypt the frame
+func (f *Frame) Decrypt(fn DecryptFn) error {
+	decryptedData, err := fn(f.buffer[:f.lastReadBytes])
+	if err != nil {
+		return err
 	}
+
+	copy(f.buffer, decryptedData)
+	f.lastReadBytes = len(decryptedData)
 
 	return nil
 }
@@ -65,23 +67,29 @@ func (f *Frame) Write() error {
 		return ezbin.ErrNothingToWrite
 	}
 
-	// Encrypt if protocol is set
-	if f.protocol != nil {
-		encryptedData, err := f.protocol.Encrypt(f.buffer[:f.writeSize])
-		if err != nil {
-			return err
-		}
-
-		f.writeRange(0, encryptedData)
-	}
-
 	_, err := f.conn.Write(f.buffer[:f.writeSize])
 	if err != nil {
 		return err
 	}
 
+	f.debugMessageF("Wrote %d bytes", f.writeSize)
+
 	f.lastReadBytes = 0
 	f.writeSize = 0
+
+	return nil
+}
+
+// Encrypt the frame
+func (f *Frame) Encrypt(fn EncryptFn) error {
+	encryptedData, err := fn(f.buffer[:f.writeSize])
+	if err != nil {
+		return err
+	}
+
+	f.debugMessageF("Encrypted %d bytes, before: %d", len(encryptedData), f.writeSize)
+
+	f.writeRange(0, encryptedData)
 
 	return nil
 }
@@ -190,4 +198,16 @@ func (f *Frame) writeRange(start int, data []byte) error {
 	}
 
 	return nil
+}
+
+func (f *Frame) debugMessage(message string) {
+	if f.Debug {
+		log.Println(message)
+	}
+}
+
+func (f *Frame) debugMessageF(fmt string, args ...any) {
+	if f.Debug {
+		log.Printf(fmt, args...)
+	}
 }

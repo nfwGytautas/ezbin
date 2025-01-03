@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
+	"github.com/nfwGytautas/ezbin/ezbin/protocol"
 )
 
 func (c *serverP2CClient) handshake() error {
@@ -14,24 +15,28 @@ func (c *serverP2CClient) handshake() error {
 		Framesize: c.config.Server.FrameSize,
 	}
 
-	err := c.frame.ToJSON(&req)
+	err := c.frame.Decrypt(c.config.Handshake.Decrypt)
+	if err != nil {
+		return err
+	}
+
+	err = c.frame.ToJSON(&req)
 	if err != nil {
 		return err
 	}
 
 	log.Println("handshake request received:", req)
 
-	// Setup protocol
-	p, err := c.config.Peer.Protocol.Get(req.Protocol)
+	c.aesTransfer = protocol.NewAesTransferFromKey(req.Key)
+
+	err = c.frame.FromJSON(res)
 	if err != nil {
 		return err
 	}
 
-	// Set encryption key to the client key
-	p.SetEncryptionKey(req.Key)
-	c.frame.SetProtocol(p)
+	log.Println("handshake response sent:", res)
 
-	err = c.frame.FromJSON(res)
+	err = c.frame.Encrypt(c.aesTransfer.Encrypt)
 	if err != nil {
 		return err
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/nfwGytautas/ezbin/ezbin"
 	"github.com/nfwGytautas/ezbin/ezbin/connection"
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
+	"github.com/nfwGytautas/ezbin/ezbin/protocol"
 )
 
 // TODO: Protocol
@@ -20,6 +21,7 @@ type serverP2CClient struct {
 	clientIdentity    string
 	handshakeFinished bool
 	frame             *connection.Frame
+	aesTransfer       *protocol.AesTransfer
 }
 
 // Create new server client
@@ -40,8 +42,6 @@ func (c *serverP2CClient) handleConnection() {
 
 	log.Println("handling incoming connection...")
 
-	c.frame.SetProtocol(c.config.Handshake)
-
 	for {
 		err := c.conn.SetReadDeadline(time.Now().Add(connection.HANDSHAKE_READ_TIMEOUT))
 		if err != nil {
@@ -58,6 +58,16 @@ func (c *serverP2CClient) handleConnection() {
 
 			log.Println("Error:", err)
 			return
+		}
+
+		if !c.handshakeFinished {
+			err := c.handshake()
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			continue
 		}
 
 		// Unmarshal the handshake request
@@ -107,17 +117,14 @@ func (c *serverP2CClient) receivePacket() error {
 
 // Handle incoming request
 func (c *serverP2CClient) handleRequest() error {
+	err := c.frame.Decrypt(c.aesTransfer.Decrypt)
+	if err != nil {
+		return err
+	}
+
 	header := c.frame.GetHeader()
 
 	log.Println("header received:", header)
-
-	if !c.handshakeFinished {
-		if header != requests.HeaderHandshake {
-			return ezbin.ErrHandshakeNotFinished
-		}
-
-		return c.handshake()
-	}
 
 	switch header {
 	case requests.HeaderPackageInfo:

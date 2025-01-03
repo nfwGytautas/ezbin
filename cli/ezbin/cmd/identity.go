@@ -41,8 +41,6 @@ var checkIdentity = &cobra.Command{
 
 		cmd.Println("Package directory:")
 		cmd.Println("    +", identity.PackageDir)
-
-		cmd.Println(identity.Protocols)
 	},
 }
 

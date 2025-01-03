@@ -13,10 +13,10 @@ import (
 )
 
 type client2P struct {
-	conn      net.Conn
-	frame     *connection.Frame
-	framesize int
-	protocol  protocol.Protocol
+	conn        net.Conn
+	frame       *connection.Frame
+	framesize   int
+	aesTransfer *protocol.AesTransfer
 }
 
 // Close the connection
@@ -32,6 +32,11 @@ func (c *client2P) send(header string, req any) error {
 	}
 
 	err = c.frame.FromJSON(req)
+	if err != nil {
+		return err
+	}
+
+	err = c.frame.Encrypt(c.aesTransfer.Encrypt)
 	if err != nil {
 		return err
 	}
@@ -62,6 +67,11 @@ func (c *client2P) startPacketStream() error {
 // Receive data from peer
 func (c *client2P) receive(res any) error {
 	err := c.frame.Read()
+	if err != nil {
+		return err
+	}
+
+	err = c.frame.Decrypt(c.aesTransfer.Decrypt)
 	if err != nil {
 		return err
 	}
@@ -101,26 +111,39 @@ func (c *client2P) receivePacket() error {
 }
 
 // Handshake with the peer
-func (c *client2P) handshake(identifier string, serverKey string, p protocol.Protocol) error {
+func (c *client2P) handshake(identifier string, serverKey string, aesTransferKey string) error {
 	req := requests.HandshakeRequest{
 		UserIdentifier: identifier,
-		Protocol:       p.Name(),
-		Key:            p.GetShareableKey(),
+		Key:            aesTransferKey,
 	}
 
 	res := requests.HandshakeResponse{}
 
-	c.frame.SetProtocol(&protocol.HandshakeProtocol{
-		PublicKey: serverKey,
-	})
+	hs := protocol.NewHandshakeFromKeys(serverKey, "")
+	c.aesTransfer = protocol.NewAesTransferFromKey(aesTransferKey)
 
-	err := c.send(requests.HeaderHandshake, req)
+	// Send out handshake
+	err := c.frame.SetHeader(requests.HeaderHandshake)
 	if err != nil {
 		return err
 	}
 
-	c.frame.SetProtocol(p)
+	err = c.frame.FromJSON(req)
+	if err != nil {
+		return err
+	}
 
+	err = c.frame.Encrypt(hs.Encrypt)
+	if err != nil {
+		return err
+	}
+
+	err = c.frame.Write()
+	if err != nil {
+		return err
+	}
+
+	// Receive response
 	err = c.receive(&res)
 	if err != nil {
 		return err
@@ -132,10 +155,6 @@ func (c *client2P) handshake(identifier string, serverKey string, p protocol.Pro
 
 	c.frame = connection.NewFrame(c.conn, make([]byte, res.Framesize))
 	c.framesize = res.Framesize
-
-	// Set the encryption key to the server one
-	p.SetEncryptionKey(res.Key)
-	c.frame.SetProtocol(p)
 
 	return nil
 }

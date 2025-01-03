@@ -17,7 +17,7 @@ type DaemonConfig struct {
 	Version    string `yaml:"version"`
 	Identifier string `yaml:"identifier"`
 
-	Handshake *protocol.HandshakeProtocol `yaml:"connection"`
+	Handshake *protocol.Handshake `yaml:"handshake"`
 
 	Server struct {
 		Port      int `yaml:"port"`
@@ -27,10 +27,6 @@ type DaemonConfig struct {
 	Storage struct {
 		Location string `yaml:"location"`
 	} `yaml:"storage"`
-
-	Peer *struct {
-		Protocol protocol.Protocols `yaml:"protocol"`
-	} `yaml:"peer"`
 }
 
 func NewDefaultDaemonConfig() (*DaemonConfig, error) {
@@ -46,11 +42,11 @@ func NewDefaultDaemonConfig() (*DaemonConfig, error) {
 	dc.Identifier = uuid.String()
 
 	// Set key info
-	p, err := protocol.NewHandshakeProtocol()
+	hs, err := protocol.NewHandshake()
 	if err != nil {
 		return nil, err
 	}
-	dc.Handshake = p
+	dc.Handshake = hs
 
 	// Other properties
 	dc.Server.Port = 32000
@@ -89,7 +85,7 @@ func (dc *DaemonConfig) Run() error {
 	log.Println("version: ", ezbin.VERSION)
 
 	log.Printf("running %s", dc.Identifier)
-	log.Printf("server connection key: %s", strings.ReplaceAll(dc.Handshake.PublicKey, "\n", ""))
+	log.Printf("server connection key: %s", strings.ReplaceAll(dc.Handshake.EncryptionKey, "\n", ""))
 
 	err := dc.initPackageDirectory()
 	if err != nil {
