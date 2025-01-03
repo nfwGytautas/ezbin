@@ -20,6 +20,7 @@ Easy configurable self-hosting binary artifact storage
 
 ### v2
 
+- [ ] Local identity vs global
 - [ ] Cleanup the code structure
 - [ ] Error robustness
 
@@ -30,6 +31,10 @@ Easy configurable self-hosting binary artifact storage
 ### v4
 
 - [ ] apt/brew/web install (make it ez)
+
+### v5
+
+- [ ] git workflow files/actions
 
 
 *tbd*
