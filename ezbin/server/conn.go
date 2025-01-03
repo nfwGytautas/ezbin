@@ -40,6 +40,8 @@ func (c *serverP2CClient) handleConnection() {
 
 	log.Println("handling incoming connection...")
 
+	c.frame.SetProtocol(c.config.Handshake)
+
 	for {
 		err := c.conn.SetReadDeadline(time.Now().Add(connection.HANDSHAKE_READ_TIMEOUT))
 		if err != nil {
@@ -106,6 +108,8 @@ func (c *serverP2CClient) receivePacket() error {
 // Handle incoming request
 func (c *serverP2CClient) handleRequest() error {
 	header := c.frame.GetHeader()
+
+	log.Println("header received:", header)
 
 	if !c.handshakeFinished {
 		if header != requests.HeaderHandshake {

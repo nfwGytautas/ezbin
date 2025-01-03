@@ -19,4 +19,5 @@ var (
 	ErrPeerExists           = errors.New("peer already exists")
 	ErrPackageNotFound      = errors.New("package not found")
 	ErrExceededFrameSize    = errors.New("exceeded frame size")
+	ErrUnknownProtocol      = errors.New("unknown protocol")
 )

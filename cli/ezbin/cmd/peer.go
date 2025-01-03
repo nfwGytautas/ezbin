@@ -98,6 +98,26 @@ var peerCheckCmd = &cobra.Command{
 	},
 }
 
+var peerSetProtocolCmd = &cobra.Command{
+	Use:   "protocol <peer_name> <protocol_name>",
+	Short: "Set the protocol name of the peer",
+	Long:  `Set the protocol name of the peer`,
+	Args:  cobra.ExactArgs(2),
+	Run: func(cmd *cobra.Command, args []string) {
+		identity, err := ezbin_client.LoadUserIdentity()
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		err = identity.SetProtocol(args[0], args[1])
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+	},
+}
+
 func init() {
 	peerAddCmd.Flags().BoolP("verify", "v", false, "Verify connection to peer")
 
@@ -105,5 +125,6 @@ func init() {
 	peerCmd.AddCommand(peerRemoveCmd)
 	peerCmd.AddCommand(peerListCmd)
 	peerCmd.AddCommand(peerCheckCmd)
+	peerCmd.AddCommand(peerSetProtocolCmd)
 	rootCmd.AddCommand(peerCmd)
 }

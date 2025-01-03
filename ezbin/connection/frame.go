@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/nfwGytautas/ezbin/ezbin"
+	"github.com/nfwGytautas/ezbin/ezbin/protocol"
 )
 
 // Frame is a struct that represents a ezbin tcp frame
@@ -16,14 +17,22 @@ type Frame struct {
 
 	lastReadBytes int
 	writeSize     int
+
+	protocol protocol.Protocol
 }
 
 // NewFrame creates a new frame
 func NewFrame(conn net.Conn, buffer []byte) *Frame {
 	return &Frame{
-		conn:   conn,
-		buffer: buffer,
+		conn:     conn,
+		buffer:   buffer,
+		protocol: nil,
 	}
+}
+
+// Set a protocol for the frame
+func (f *Frame) SetProtocol(protocol protocol.Protocol) {
+	f.protocol = protocol
 }
 
 // Read the frame from the connection
@@ -36,6 +45,17 @@ func (f *Frame) Read() error {
 	f.lastReadBytes = n
 	f.writeSize = 0
 
+	// Decrypt if protocol is set
+	if f.protocol != nil {
+		decryptedData, err := f.protocol.Decrypt(f.buffer[:f.lastReadBytes])
+		if err != nil {
+			return err
+		}
+
+		copy(f.buffer, decryptedData)
+		f.lastReadBytes = len(decryptedData)
+	}
+
 	return nil
 }
 
@@ -43,6 +63,16 @@ func (f *Frame) Read() error {
 func (f *Frame) Write() error {
 	if f.writeSize == 0 {
 		return ezbin.ErrNothingToWrite
+	}
+
+	// Encrypt if protocol is set
+	if f.protocol != nil {
+		encryptedData, err := f.protocol.Encrypt(f.buffer[:f.writeSize])
+		if err != nil {
+			return err
+		}
+
+		f.writeRange(0, encryptedData)
 	}
 
 	_, err := f.conn.Write(f.buffer[:f.writeSize])

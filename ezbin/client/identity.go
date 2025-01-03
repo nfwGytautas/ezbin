@@ -17,17 +17,18 @@ const PACKAGE_DIR = ".ezbin"
 
 // Peer info
 type PeerInfo struct {
-	Address string `json:"address"`
-	Key     string `json:"key"`
+	Address  string `json:"address"`
+	Key      string `json:"key"`
+	Protocol string `json:"protocol"`
 }
 
 // UserIdentity is a struct that represents a user's identity
 type UserIdentity struct {
-	Version      string                           `json:"version"`
-	Identifier   string                           `json:"identifier"`
-	PackageDir   string                           `json:"packageDir"`
-	ProtocolInfo map[string]protocol.ProtocolData `json:"protocolData"`
-	Peers        map[string]PeerInfo              `json:"Peers"`
+	Version    string              `json:"version"`
+	Identifier string              `json:"identifier"`
+	PackageDir string              `json:"packageDir"`
+	Protocols  protocol.Protocols  `json:"protocolData"`
+	Peers      map[string]PeerInfo `json:"Peers"`
 }
 
 // Load local user identity from `.ezbin.identity.json`
@@ -71,9 +72,8 @@ func GenerateUserIdentity() (*UserIdentity, error) {
 	fmt.Println("🔨 Constructing new identity...")
 
 	identity := UserIdentity{
-		Version:      ezbin.VERSION,
-		ProtocolInfo: make(map[string]protocol.ProtocolData),
-		Peers:        make(map[string]PeerInfo),
+		Version: ezbin.VERSION,
+		Peers:   make(map[string]PeerInfo),
 	}
 
 	// Generate identifier
@@ -84,15 +84,11 @@ func GenerateUserIdentity() (*UserIdentity, error) {
 	identity.Identifier = uuid.String()
 
 	// Generate protocols
-	for _, protocol := range protocol.GetSupportedProtocols() {
-		fmt.Printf("	+ %s (%s)\n", protocol.Name(), protocol.Version())
-		data, err := protocol.GenerateNew()
-		if err != nil {
-			return nil, err
-		}
-
-		identity.ProtocolInfo[protocol.Name()] = data
+	protocols, err := protocol.GenerateProtocols()
+	if err != nil {
+		return nil, err
 	}
+	identity.Protocols = protocols
 
 	// Package directory
 	homeDir, err := shared.HomeDirectory()
@@ -137,8 +133,28 @@ func (ui *UserIdentity) ListPeers() {
 
 	fmt.Println("Peers:")
 	for name, c := range ui.Peers {
-		fmt.Printf("	- %s %s\n", name, c.Address)
+		fmt.Printf("	- %s %s %s\n", name, c.Address, c.Protocol)
 	}
+}
+
+// Set the protocol to use for the peer
+func (ui *UserIdentity) SetProtocol(peer string, protocol string) error {
+	peerInfo, err := ui.GetPeer(peer)
+	if err != nil {
+		return err
+	}
+
+	peerInfo.Protocol = protocol
+
+	ui.Peers[peer] = peerInfo
+
+	// Save
+	err = ui.Save()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Check if peer exists
@@ -358,6 +374,11 @@ func (ui *UserIdentity) connectToPeer(peer string) (*client2P, error) {
 	// Open a connection to peer
 	connData := ui.Peers[peer]
 
+	protocol, err := ui.Protocols.Get(connData.Protocol)
+	if err != nil {
+		return nil, err
+	}
+
 	conn, err := net.Dial("tcp", connData.Address)
 	if err != nil {
 		return nil, err
@@ -367,7 +388,7 @@ func (ui *UserIdentity) connectToPeer(peer string) (*client2P, error) {
 	c.frame = connection.NewFrame(conn, make([]byte, connection.HANDSHAKE_BUFFER_SIZE))
 
 	// Handshake with the peer
-	err = c.handshake(ui.Identifier, connData.Key)
+	err = c.handshake(ui.Identifier, connData.Key, protocol)
 	if err != nil {
 		conn.Close()
 		return nil, err

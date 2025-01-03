@@ -12,7 +12,6 @@ func (c *serverP2CClient) handshake() error {
 	res := requests.HandshakeResponse{
 		Okay:      true, // TODO: user authentication
 		Framesize: c.config.Server.FrameSize,
-		Protocol:  c.config.Peer.Protocol,
 	}
 
 	err := c.frame.ToJSON(&req)
@@ -21,6 +20,16 @@ func (c *serverP2CClient) handshake() error {
 	}
 
 	log.Println("handshake request received:", req)
+
+	// Setup protocol
+	p, err := c.config.Peer.Protocol.Get(req.Protocol)
+	if err != nil {
+		return err
+	}
+
+	// Set encryption key to the client key
+	p.SetEncryptionKey(req.Key)
+	c.frame.SetProtocol(p)
 
 	err = c.frame.FromJSON(res)
 	if err != nil {

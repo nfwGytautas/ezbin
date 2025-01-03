@@ -8,6 +8,7 @@ import (
 	"github.com/nfwGytautas/ezbin/ezbin"
 	"github.com/nfwGytautas/ezbin/ezbin/connection"
 	"github.com/nfwGytautas/ezbin/ezbin/connection/requests"
+	"github.com/nfwGytautas/ezbin/ezbin/protocol"
 	"github.com/nfwGytautas/ezbin/shared"
 )
 
@@ -15,6 +16,7 @@ type client2P struct {
 	conn      net.Conn
 	frame     *connection.Frame
 	framesize int
+	protocol  protocol.Protocol
 }
 
 // Close the connection
@@ -99,17 +101,25 @@ func (c *client2P) receivePacket() error {
 }
 
 // Handshake with the peer
-func (c *client2P) handshake(identifier string, key string) error {
+func (c *client2P) handshake(identifier string, serverKey string, p protocol.Protocol) error {
 	req := requests.HandshakeRequest{
 		UserIdentifier: identifier,
+		Protocol:       p.Name(),
+		Key:            p.GetShareableKey(),
 	}
 
 	res := requests.HandshakeResponse{}
+
+	c.frame.SetProtocol(&protocol.HandshakeProtocol{
+		PublicKey: serverKey,
+	})
 
 	err := c.send(requests.HeaderHandshake, req)
 	if err != nil {
 		return err
 	}
+
+	c.frame.SetProtocol(p)
 
 	err = c.receive(&res)
 	if err != nil {
@@ -122,6 +132,10 @@ func (c *client2P) handshake(identifier string, key string) error {
 
 	c.frame = connection.NewFrame(c.conn, make([]byte, res.Framesize))
 	c.framesize = res.Framesize
+
+	// Set the encryption key to the server one
+	p.SetEncryptionKey(res.Key)
+	c.frame.SetProtocol(p)
 
 	return nil
 }

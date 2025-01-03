@@ -6,26 +6,18 @@ import (
 	"net"
 	"strings"
 
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-
 	"github.com/google/uuid"
 	"github.com/nfwGytautas/ezbin/ezbin"
+	"github.com/nfwGytautas/ezbin/ezbin/protocol"
 	"github.com/nfwGytautas/ezbin/shared"
 )
-
-const pCONNECTION_KEY_SIZE = 2048
 
 // Daemon config
 type DaemonConfig struct {
 	Version    string `yaml:"version"`
 	Identifier string `yaml:"identifier"`
 
-	Connection struct {
-		Public  string `yaml:"public"`
-		Private string `yaml:"private"`
-	} `yaml:"connection"`
+	Handshake *protocol.HandshakeProtocol `yaml:"connection"`
 
 	Server struct {
 		Port      int `yaml:"port"`
@@ -37,7 +29,7 @@ type DaemonConfig struct {
 	} `yaml:"storage"`
 
 	Peer *struct {
-		Protocol string `yaml:"protocol"`
+		Protocol protocol.Protocols `yaml:"protocol"`
 	} `yaml:"peer"`
 }
 
@@ -53,26 +45,12 @@ func NewDefaultDaemonConfig() (*DaemonConfig, error) {
 	}
 	dc.Identifier = uuid.String()
 
-	// Generate connection key
-	privateKey, err := rsa.GenerateKey(rand.Reader, pCONNECTION_KEY_SIZE)
-	if err != nil {
-		return nil, err
-	}
-	privateKeyBytes, err := x509.MarshalPKCS8PrivateKey(privateKey)
-	if err != nil {
-		return nil, err
-	}
-
-	// Generate the public key
-	publicKey := &privateKey.PublicKey
-	publicKeyBytes, err := x509.MarshalPKIXPublicKey(publicKey)
-	if err != nil {
-		return nil, err
-	}
-
 	// Set key info
-	dc.Connection.Public = string(publicKeyBytes)
-	dc.Connection.Private = string(privateKeyBytes)
+	p, err := protocol.NewHandshakeProtocol()
+	if err != nil {
+		return nil, err
+	}
+	dc.Handshake = p
 
 	// Other properties
 	dc.Server.Port = 32000
@@ -111,7 +89,7 @@ func (dc *DaemonConfig) Run() error {
 	log.Println("version: ", ezbin.VERSION)
 
 	log.Printf("running %s", dc.Identifier)
-	log.Printf("server connection key: %s", strings.ReplaceAll(dc.Connection.Public, "\n", ""))
+	log.Printf("server connection key: %s", strings.ReplaceAll(dc.Handshake.PublicKey, "\n", ""))
 
 	err := dc.initPackageDirectory()
 	if err != nil {

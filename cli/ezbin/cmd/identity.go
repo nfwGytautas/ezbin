@@ -35,7 +35,14 @@ var checkIdentity = &cobra.Command{
 		}
 
 		cmd.Println("✅ Identity loaded successfully")
-		cmd.Println(identity.Identifier)
+
+		cmd.Println("ID:")
+		cmd.Println("    +", identity.Identifier)
+
+		cmd.Println("Package directory:")
+		cmd.Println("    +", identity.PackageDir)
+
+		cmd.Println(identity.Protocols)
 	},
 }
 
