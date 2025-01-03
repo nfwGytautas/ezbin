@@ -56,6 +56,11 @@ func (c *client2P) startPacketStream() error {
 		return err
 	}
 
+	err = c.frame.Encrypt(c.aesTransfer.Encrypt)
+	if err != nil {
+		return err
+	}
+
 	err = c.frame.Write()
 	if err != nil {
 		return err
@@ -226,6 +231,11 @@ func (c *client2P) DownloadPackage(name string, version string, outDir string, i
 		err := c.frame.Read()
 		if err != nil {
 			// TODO: Error handling, request the same packet again
+			return err
+		}
+
+		err = c.frame.Decrypt(c.aesTransfer.Decrypt)
+		if err != nil {
 			return err
 		}
 

@@ -71,6 +71,11 @@ func (c *serverP2CClient) downloadPackage() error {
 		return err
 	}
 
+	err = c.frame.Encrypt(c.aesTransfer.Encrypt)
+	if err != nil {
+		return err
+	}
+
 	err = c.frame.Write()
 	if err != nil {
 		return err
@@ -78,6 +83,11 @@ func (c *serverP2CClient) downloadPackage() error {
 
 	// Wait for start
 	err = c.frame.Read()
+	if err != nil {
+		return err
+	}
+
+	err = c.frame.Decrypt(c.aesTransfer.Decrypt)
 	if err != nil {
 		return err
 	}
@@ -103,6 +113,12 @@ func (c *serverP2CClient) downloadPackage() error {
 		}
 
 		log.Printf("sending packet: [%v/%v] size (no header): %v for %s", i+1, res.PacketCount, c.frame.GetFrameSize(), c.clientIdentity)
+
+		err = c.frame.Encrypt(c.aesTransfer.Encrypt)
+		if err != nil {
+			return err
+		}
+
 		err = c.frame.Write()
 		if err != nil {
 			return err

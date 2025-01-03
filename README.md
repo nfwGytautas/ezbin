@@ -15,7 +15,7 @@ Easy configurable self-hosting binary artifact storage
 ### v1
 
 - [ ] CRC/MD5
-- [ ] E2E encryption
+- [x] E2E encryption
 - [ ] System architecture-platform dependant
 
 ### v2

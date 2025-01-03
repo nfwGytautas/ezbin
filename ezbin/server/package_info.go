@@ -60,6 +60,11 @@ func (c *serverP2CClient) packageInfo() error {
 		return err
 	}
 
+	err = c.frame.Encrypt(c.aesTransfer.Encrypt)
+	if err != nil {
+		return err
+	}
+
 	err = c.frame.Write()
 	if err != nil {
 		return err

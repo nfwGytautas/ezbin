@@ -275,6 +275,16 @@ func (ui *UserIdentity) RemovePackage(pck string) error {
 func (ui *UserIdentity) ListPackages() error {
 	outDir := ui.PackageDir + "/"
 
+	exists, err := shared.DirectoryExists(outDir)
+	if err != nil {
+		return err
+	}
+
+	if !exists {
+		fmt.Println("⚠️ No packages found")
+		return nil
+	}
+
 	// List all packages
 	packages, err := shared.GetSubdirectories(outDir)
 	if err != nil {

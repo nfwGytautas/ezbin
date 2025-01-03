@@ -55,6 +55,8 @@ func (f *Frame) Decrypt(fn DecryptFn) error {
 		return err
 	}
 
+	f.debugMessageF("Decrypted %d bytes, after: %d", f.lastReadBytes, len(decryptedData))
+
 	copy(f.buffer, decryptedData)
 	f.lastReadBytes = len(decryptedData)
 
